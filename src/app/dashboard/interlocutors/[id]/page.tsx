@@ -14,8 +14,10 @@ import EventForm from '@/components/EventForm';
 import ModuleAddForm from '@/components/ModuleAddForm';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
 import EligibilityChecker from '@/components/EligibilityChecker';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export default function InterlocutorDetailPage() {
+  const isClient = useClientSide();
   const { user } = useAuth();
   const params = useParams();
   const router = useRouter();
@@ -40,7 +42,7 @@ export default function InterlocutorDetailPage() {
 
   useEffect(() => {
     // Vérifier le mode simulation
-    if (typeof window !== 'undefined') {
+    if (isClient) {
       const simulationMode = localStorage.getItem('simulation_mode') === 'true';
       const simulatedData = localStorage.getItem('simulated_interlocutor');
       
@@ -57,7 +59,7 @@ export default function InterlocutorDetailPage() {
     if (params.id) {
       loadInterlocutor();
     }
-  }, [params.id]);
+  }, [params.id, isClient]);
 
   const loadInterlocutor = async () => {
     try {

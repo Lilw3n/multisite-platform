@@ -5,8 +5,10 @@ import Link from 'next/link';
 import ExternalUserLayout from '@/components/layout/ExternalUserLayout';
 import { Interlocutor } from '@/types/interlocutor';
 import { InterlocutorService } from '@/lib/interlocutors';
+import { useClientSide } from '@/hooks/useClientSide';
 
 export default function InterlocutorSimulationPage() {
+  const isClient = useClientSide();
   const [interlocutors, setInterlocutors] = useState<Interlocutor[]>([]);
   const [filteredInterlocutors, setFilteredInterlocutors] = useState<Interlocutor[]>([]);
   const [selectedInterlocutor, setSelectedInterlocutor] = useState<Interlocutor | null>(null);
@@ -107,7 +109,7 @@ export default function InterlocutorSimulationPage() {
 
   const handleSimulateInterlocutor = (interlocutor: Interlocutor) => {
     // Simuler l'interlocuteur en stockant ses données
-    if (typeof window !== 'undefined') {
+    if (isClient) {
       localStorage.setItem('simulated_interlocutor', JSON.stringify(interlocutor));
       localStorage.setItem('view_mode', 'external');
       localStorage.setItem('simulation_mode', 'true');

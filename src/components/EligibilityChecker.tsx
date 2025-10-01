@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Interlocutor, Driver, Vehicle, Claim } from '@/types/interlocutor';
 import { EligibilityService, EligibilityResult, EvaluationData } from '@/lib/eligibilityService';
+import { useClientSide } from '@/hooks/useClientSide';
 
 interface EligibilityCheckerProps {
   interlocutor: Interlocutor;
@@ -17,6 +18,7 @@ export default function EligibilityChecker({
   vehicles = [], 
   claims = [] 
 }: EligibilityCheckerProps) {
+  const isClient = useClientSide();
   const [eligibilityData, setEligibilityData] = useState<EvaluationData | null>(null);
   const [results, setResults] = useState<EligibilityResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,6 +71,28 @@ export default function EligibilityChecker({
   const getEligibilityIcon = (eligible: boolean) => {
     return eligible ? '✅' : '❌';
   };
+
+  // Ne pas rendre le composant côté serveur pour éviter les erreurs d'hydratation
+  if (!isClient) {
+    return (
+      <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+        <div className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <h3 className="text-lg font-semibold flex items-center">
+            <span className="mr-2 text-xl">🎯</span>
+            Vérificateur d'Éligibilité Assurance
+          </h3>
+        </div>
+        <div className="p-4">
+          <div className="text-center py-8 text-gray-500">
+            <div className="animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">

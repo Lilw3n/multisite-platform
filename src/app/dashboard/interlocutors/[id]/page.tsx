@@ -13,6 +13,7 @@ import ModuleUnlinkManager from '@/components/ModuleUnlinkManager';
 import EventForm from '@/components/EventForm';
 import ModuleAddForm from '@/components/ModuleAddForm';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
+import EligibilityChecker from '@/components/EligibilityChecker';
 
 export default function InterlocutorDetailPage() {
   const { user } = useAuth();
@@ -34,8 +35,25 @@ export default function InterlocutorDetailPage() {
     type: 'claims' | 'vehicles' | 'drivers' | 'contracts' | 'insuranceRequests' | 'events';
     id: string;
   } | null>(null);
+  const [isSimulationMode, setIsSimulationMode] = useState(false);
+  const [simulatedInterlocutor, setSimulatedInterlocutor] = useState<Interlocutor | null>(null);
 
   useEffect(() => {
+    // Vérifier le mode simulation
+    if (typeof window !== 'undefined') {
+      const simulationMode = localStorage.getItem('simulation_mode') === 'true';
+      const simulatedData = localStorage.getItem('simulated_interlocutor');
+      
+      setIsSimulationMode(simulationMode);
+      if (simulatedData) {
+        try {
+          setSimulatedInterlocutor(JSON.parse(simulatedData));
+        } catch (error) {
+          console.error('Erreur lors du parsing des données de simulation:', error);
+        }
+      }
+    }
+
     if (params.id) {
       loadInterlocutor();
     }
@@ -357,6 +375,34 @@ export default function InterlocutorDetailPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
         <DashboardHeader />
+        
+        {/* Indicateur de mode simulation */}
+        {isSimulationMode && simulatedInterlocutor && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <span className="text-yellow-400 text-xl">🎭</span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">
+                  <strong>Mode Simulation Actif</strong> - Vous visualisez l'interface comme : 
+                  <span className="font-semibold"> {simulatedInterlocutor.firstName} {simulatedInterlocutor.lastName}</span>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('simulation_mode');
+                      localStorage.removeItem('simulated_interlocutor');
+                      window.location.href = '/dashboard/external/simulate';
+                    }}
+                    className="ml-4 bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-xs font-medium"
+                  >
+                    Quitter la simulation
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="flex">
           <DashboardSidebar />
           <main className="flex-1 p-4">
@@ -523,6 +569,16 @@ export default function InterlocutorDetailPage() {
                     </div>
                   </div>
                 </div>
+
+              {/* Vérificateur d'éligibilité */}
+              <div className="mb-4">
+                <EligibilityChecker
+                  interlocutor={interlocutor}
+                  drivers={interlocutor.drivers}
+                  vehicles={interlocutor.vehicles}
+                  claims={interlocutor.claims}
+                />
+              </div>
 
               {/* Bouton toggle pour la sidebar des événements */}
               {interlocutor.events.length > 0 && (

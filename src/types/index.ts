@@ -413,3 +413,51 @@ export interface ViewMode {
   siteId?: string;
   isSimulated: boolean;
 }
+
+// Types pour Entreprise et Famille
+export interface Company {
+  id: string;
+  interlocutorId: string;
+  name: string;
+  siret: string;
+  vatNumber: string;
+  legalForm: string;
+  capital: number;
+  address: string;
+  phone: string;
+  email: string;
+  website?: string;
+  activity: string;
+  employees: number;
+  foundedDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Family {
+  id: string;
+  interlocutorId: string;
+  spouse?: {
+    firstName: string;
+    lastName: string;
+    email?: string;
+    phone?: string;
+    birthDate?: Date;
+    profession?: string;
+  };
+  children: Array<{
+    firstName: string;
+    lastName: string;
+    birthDate: Date;
+    relationship: 'child' | 'stepchild' | 'adopted';
+  }>;
+  emergencyContact: {
+    firstName: string;
+    lastName: string;
+    relationship: string;
+    phone: string;
+    email?: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}

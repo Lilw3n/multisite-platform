@@ -61,7 +61,7 @@ const getDefaultInterlocutors = (): Interlocutor[] => [
         description: 'Demande de devis pour assurance flotte de véhicules',
         status: 'En attente',
         requestedDate: '2024-01-20',
-        priority: 'medium',
+        priority: 'Moyenne',
         assignedTo: 'Pierre Bernard',
         interlocutorId: '1',
         createdAt: '2024-01-20T14:00:00Z',
@@ -131,7 +131,7 @@ const getDefaultInterlocutors = (): Interlocutor[] => [
           { id: 'a2', name: 'Document PDF', type: 'document' }
         ],
         status: 'completed',
-        priority: 'medium',
+        priority: 'Moyenne',
         createdAt: '2025-01-27',
         updatedAt: '2025-01-27',
         createdBy: 'Marie Martin'
@@ -159,6 +159,8 @@ const getDefaultInterlocutors = (): Interlocutor[] => [
         createdBy: 'Admin System'
       }
     ],
+    familyMembers: [],
+    companyRelations: [],
     userAccount: {
       userId: 'u1',
       permissions: ['read', 'write'],
@@ -207,6 +209,8 @@ const getDefaultInterlocutors = (): Interlocutor[] => [
         createdBy: 'Jean Dupont'
       }
     ],
+    familyMembers: [],
+    companyRelations: [],
     externalInfo: {
       source: 'website',
       notes: 'Prospect intéressé par nos services',

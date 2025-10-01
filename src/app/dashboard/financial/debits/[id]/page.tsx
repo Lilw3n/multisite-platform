@@ -5,16 +5,23 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface DebitDetailProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function DebitDetailPage({ params }: DebitDetailProps) {
-  const { id } = params;
+  const [id, setId] = useState<string>('');
   const [user, setUser] = useState<{ email: string; name: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    // Résoudre les params
+    params.then((resolvedParams) => {
+      setId(resolvedParams.id);
+    });
+  }, [params]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

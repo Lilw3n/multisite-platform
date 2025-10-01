@@ -73,10 +73,10 @@ export const INSURANCE_PRODUCTS: EligibilityCriteria[] = [
     responsibilityRules: 'Corporel responsable interdit, aucun sinistre sur 12 derniers mois'
   },
   {
-    product: 'Avace Assurance VTC',
-    antecedentsRequired: '36 mois perso (débutant) ou 12 mois pro (expérimenté)',
+    product: 'Axece Assurance VTC',
+    antecedentsRequired: '36 mois perso (bonus 0.50-0.85) OU 12 mois pro VTC',
     antecedentsType: 'Particuliers acceptés',
-    bonusRequired: '1.50 (expérimentés) / 0.50 à 1.50 (débutants)',
+    bonusRequired: '0.50 à 0.85 (perso) / Aucun (pro VTC)',
     ageRequired: '> 25 ans et 1 jour',
     licenseSeniority: 'valide',
     maxClaims36Months: {

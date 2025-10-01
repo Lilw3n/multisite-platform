@@ -14,7 +14,11 @@ import EventForm from '@/components/EventForm';
 import ModuleAddForm from '@/components/ModuleAddForm';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
 import EligibilityChecker from '@/components/EligibilityChecker';
+import CompanyForm from '@/components/CompanyForm';
+import FamilyForm from '@/components/FamilyForm';
+import InterlocutorEditForm from '@/components/InterlocutorEditForm';
 import { useClientSide } from '@/hooks/useClientSide';
+import { Company, Family } from '@/types';
 
 export default function InterlocutorDetailPage() {
   const isClient = useClientSide();
@@ -39,6 +43,11 @@ export default function InterlocutorDetailPage() {
   } | null>(null);
   const [isSimulationMode, setIsSimulationMode] = useState(false);
   const [simulatedInterlocutor, setSimulatedInterlocutor] = useState<Interlocutor | null>(null);
+  const [showCompanyForm, setShowCompanyForm] = useState(false);
+  const [showFamilyForm, setShowFamilyForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [company, setCompany] = useState<Company | null>(null);
+  const [family, setFamily] = useState<Family | null>(null);
 
   useEffect(() => {
     // Vérifier le mode simulation
@@ -190,6 +199,27 @@ export default function InterlocutorDetailPage() {
   const handleModifyModule = (type: string, id: string) => {
     // Pour l'instant, on affiche une alerte. Plus tard, on pourra implémenter un formulaire de modification
     alert(`Modification de ${type} ${id} - Fonctionnalité à implémenter`);
+  };
+
+  const handleCompanySuccess = (companyData: Company) => {
+    setCompany(companyData);
+    setShowCompanyForm(false);
+    // Ici vous pourriez sauvegarder en base de données
+    console.log('Entreprise ajoutée:', companyData);
+  };
+
+  const handleFamilySuccess = (familyData: Family) => {
+    setFamily(familyData);
+    setShowFamilyForm(false);
+    // Ici vous pourriez sauvegarder en base de données
+    console.log('Famille ajoutée:', familyData);
+  };
+
+  const handleInterlocutorEditSuccess = (updatedInterlocutor: Interlocutor) => {
+    setInterlocutor(updatedInterlocutor);
+    setShowEditForm(false);
+    // Ici vous pourriez sauvegarder en base de données
+    console.log('Interlocuteur modifié:', updatedInterlocutor);
   };
 
   // Afficher le chargement pendant la vérification de l'authentification
@@ -419,12 +449,20 @@ export default function InterlocutorDetailPage() {
                       {interlocutor.company && ` - ${interlocutor.company}`}
                     </p>
                   </div>
-                  <button
-                    onClick={() => router.push('/dashboard/interlocutors')}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                  >
-                    ← Retour au Dashboard
-      </button>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setShowEditForm(true)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    >
+                      ✏️ Modifier
+                    </button>
+                    <button
+                      onClick={() => router.push('/dashboard/interlocutors')}
+                      className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    >
+                      ← Retour au Dashboard
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -486,7 +524,7 @@ export default function InterlocutorDetailPage() {
                         {interlocutor.address && (
                           <p className="flex items-center">
                             <span className="w-5 h-5 mr-2">📍</span>
-                            {interlocutor.address}
+                            {interlocutor.address.street}, {interlocutor.address.postalCode} {interlocutor.address.city}, {interlocutor.address.country}
                           </p>
                 )}
               </div>
@@ -530,7 +568,7 @@ export default function InterlocutorDetailPage() {
                         Entreprise
                       </h3>
                 <button
-                        onClick={() => alert('Fonctionnalité d\'ajout d\'entreprise à implémenter')}
+                        onClick={() => setShowCompanyForm(true)}
                         className="bg-white text-orange-600 hover:bg-orange-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                       >
                         + Ajouter
@@ -539,11 +577,62 @@ export default function InterlocutorDetailPage() {
           </div>
                   <div className="p-4">
                     <div className="space-y-3">
-                      <div className="text-center py-4 text-gray-500 text-base">
-                        Aucune information d'entreprise disponible
-                      </div>
-                      </div>
+                      {company ? (
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="font-medium text-gray-700">Nom:</span>
+                              <p className="text-gray-900">{company.name}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700">SIRET:</span>
+                              <p className="text-gray-900">{company.siret}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700">Forme juridique:</span>
+                              <p className="text-gray-900">{company.legalForm}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700">Capital:</span>
+                              <p className="text-gray-900">{company.capital.toLocaleString()}€</p>
+                            </div>
+                            <div className="col-span-2">
+                              <span className="font-medium text-gray-700">Adresse:</span>
+                              <p className="text-gray-900">{company.address}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700">Téléphone:</span>
+                              <p className="text-gray-900">{company.phone}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700">Email:</span>
+                              <p className="text-gray-900">{company.email}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700">Activité:</span>
+                              <p className="text-gray-900">{company.activity}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700">Employés:</span>
+                              <p className="text-gray-900">{company.employees}</p>
+                            </div>
+                          </div>
+                          <div className="flex justify-end space-x-2 pt-2">
+                            <button
+                              onClick={() => setShowCompanyForm(true)}
+                              className="text-orange-600 hover:text-orange-800 text-sm"
+                            >
+                              Modifier
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4 text-gray-500 text-base">
+                          Aucune information d'entreprise disponible
+                        </div>
+                      )}
                     </div>
+                  </div>
                   </div>
 
                 {/* Module Famille */}
@@ -555,7 +644,7 @@ export default function InterlocutorDetailPage() {
                         Famille
                       </h3>
                       <button 
-                        onClick={() => alert('Fonctionnalité d\'ajout de famille à implémenter')}
+                        onClick={() => setShowFamilyForm(true)}
                         className="bg-white text-pink-600 hover:bg-pink-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                       >
                         + Ajouter
@@ -564,11 +653,95 @@ export default function InterlocutorDetailPage() {
                       </div>
                   <div className="p-4">
                     <div className="space-y-3">
-                      <div className="text-center py-4 text-gray-500 text-base">
-                        Aucune information de famille disponible
-                      </div>
-                      </div>
+                      {family ? (
+                        <div className="space-y-4">
+                          {/* Conjoint(e) */}
+                          {family.spouse && (
+                            <div className="bg-white p-3 rounded-lg border">
+                              <h4 className="font-medium text-gray-900 mb-2">Conjoint(e)</h4>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                  <span className="font-medium text-gray-700">Nom:</span>
+                                  <p className="text-gray-900">{family.spouse.firstName} {family.spouse.lastName}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-700">Profession:</span>
+                                  <p className="text-gray-900">{family.spouse.profession || 'Non renseignée'}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-700">Téléphone:</span>
+                                  <p className="text-gray-900">{family.spouse.phone || 'Non renseigné'}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-700">Email:</span>
+                                  <p className="text-gray-900">{family.spouse.email || 'Non renseigné'}</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Enfants */}
+                          {family.children.length > 0 && (
+                            <div className="bg-white p-3 rounded-lg border">
+                              <h4 className="font-medium text-gray-900 mb-2">Enfants ({family.children.length})</h4>
+                              <div className="space-y-2">
+                                {family.children.map((child, index) => (
+                                  <div key={index} className="text-sm">
+                                    <span className="font-medium text-gray-700">
+                                      {child.firstName} {child.lastName}
+                                    </span>
+                                    <span className="text-gray-500 ml-2">
+                                      ({child.relationship === 'child' ? 'Enfant' : 
+                                        child.relationship === 'stepchild' ? 'Beau-enfant' : 'Adopté'})
+                                    </span>
+                                    <span className="text-gray-500 ml-2">
+                                      - {new Date(child.birthDate).toLocaleDateString('fr-FR')}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Contact d'urgence */}
+                          <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                            <h4 className="font-medium text-red-900 mb-2">Contact d'urgence</h4>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div>
+                                <span className="font-medium text-gray-700">Nom:</span>
+                                <p className="text-gray-900">{family.emergencyContact.firstName} {family.emergencyContact.lastName}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Lien:</span>
+                                <p className="text-gray-900">{family.emergencyContact.relationship}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Téléphone:</span>
+                                <p className="text-gray-900">{family.emergencyContact.phone}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Email:</span>
+                                <p className="text-gray-900">{family.emergencyContact.email || 'Non renseigné'}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-end space-x-2 pt-2">
+                            <button
+                              onClick={() => setShowFamilyForm(true)}
+                              className="text-pink-600 hover:text-pink-800 text-sm"
+                            >
+                              Modifier
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4 text-gray-500 text-base">
+                          Aucune information de famille disponible
+                        </div>
+                      )}
                     </div>
+                  </div>
                   </div>
                 </div>
 
@@ -1135,6 +1308,34 @@ export default function InterlocutorDetailPage() {
                  message="Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible."
                  itemName={deleteItem.name}
                  isLoading={isDeleting}
+               />
+             )}
+
+             {/* Formulaires Entreprise et Famille */}
+             {showCompanyForm && (
+               <CompanyForm
+                 interlocutorId={interlocutor?.id || ''}
+                 onSuccess={handleCompanySuccess}
+                 onCancel={() => setShowCompanyForm(false)}
+                 initialData={company || undefined}
+               />
+             )}
+
+             {showFamilyForm && (
+               <FamilyForm
+                 interlocutorId={interlocutor?.id || ''}
+                 onSuccess={handleFamilySuccess}
+                 onCancel={() => setShowFamilyForm(false)}
+                 initialData={family || undefined}
+               />
+             )}
+
+             {/* Formulaire de modification de l'interlocuteur */}
+             {showEditForm && interlocutor && (
+               <InterlocutorEditForm
+                 interlocutor={interlocutor}
+                 onSuccess={handleInterlocutorEditSuccess}
+                 onCancel={() => setShowEditForm(false)}
                />
              )}
            </ProtectedRoute>

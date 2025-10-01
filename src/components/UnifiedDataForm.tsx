@@ -137,16 +137,30 @@ export default function UnifiedDataForm({
     ));
   };
 
-  const handleClaimChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleClaimChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> | { target: { name: string; value: string } }) => {
     const { name, value, type } = e.target;
-    setClaims(prev => prev.map((claim, i) => 
-      i === index ? { 
-        ...claim, 
-        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
-                type === 'number' ? parseFloat(value) || 0 :
-                name === 'percentage' ? parseInt(value) : value
-      } : claim
-    ));
+    
+    setClaims(prev => prev.map((claim, i) => {
+      if (i === index) {
+        if (name === 'responsible') {
+          // Gérer la logique de responsabilité
+          if (value === 'true') {
+            return { ...claim, responsible: true, percentage: 100 };
+          } else {
+            // Si on désélectionne "responsable", on garde le pourcentage actuel ou on le met à 0
+            return { ...claim, responsible: false, percentage: claim.percentage === 100 ? 0 : claim.percentage };
+          }
+        }
+        
+        return { 
+          ...claim, 
+          [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
+                  type === 'number' ? parseFloat(value) || 0 :
+                  name === 'percentage' ? parseInt(value) : value
+        };
+      }
+      return claim;
+    }));
   };
 
   const addDriver = () => {
@@ -820,18 +834,59 @@ export default function UnifiedDataForm({
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Responsabilité
+                    </label>
+                    <div className="space-y-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name={`responsible-${index}`}
+                          checked={claim.percentage === 100}
+                          onChange={() => setClaims(prev => prev.map((c, i) => 
+                            i === index ? { ...c, responsible: true, percentage: 100 } : c
+                          ))}
+                          className="mr-2"
+                        />
+                        Totalement responsable (100%)
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name={`responsible-${index}`}
+                          checked={claim.percentage === 50}
+                          onChange={() => setClaims(prev => prev.map((c, i) => 
+                            i === index ? { ...c, responsible: false, percentage: 50 } : c
+                          ))}
+                          className="mr-2"
+                        />
+                        Partiellement responsable (50%)
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name={`responsible-${index}`}
+                          checked={claim.percentage === 0}
+                          onChange={() => setClaims(prev => prev.map((c, i) => 
+                            i === index ? { ...c, responsible: false, percentage: 0 } : c
+                          ))}
+                          className="mr-2"
+                        />
+                        Non responsable (0%)
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Pourcentage de responsabilité
                     </label>
-                    <select
-                      name="percentage"
-                      value={claim.percentage}
-                      onChange={(e) => handleClaimChange(index, e)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value={0}>0%</option>
-                      <option value={50}>50%</option>
-                      <option value={100}>100%</option>
-                    </select>
+                    <div className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 text-gray-700">
+                      {claim.percentage}% - {
+                        claim.percentage === 0 ? 'Non responsable' :
+                        claim.percentage === 50 ? 'Partiellement responsable (responsabilité partagée)' :
+                        'Totalement responsable'
+                      }
+                    </div>
                   </div>
 
                   <div>
@@ -866,20 +921,6 @@ export default function UnifiedDataForm({
                     />
                   </div>
 
-                  <div className="md:col-span-2">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        name="responsible"
-                        checked={claim.responsible}
-                        onChange={(e) => handleClaimChange(index, e)}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label className="ml-2 block text-sm text-gray-700">
-                        Responsable du sinistre
-                      </label>
-                    </div>
-                  </div>
                 </div>
               </div>
             ))}

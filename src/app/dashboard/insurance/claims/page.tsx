@@ -502,8 +502,7 @@ export default function ClaimsPage() {
               </div>
             </div>
           </div>
-        </main>
       </div>
-    </div>
+    </Layout>
   );
 }

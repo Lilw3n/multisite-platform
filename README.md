@@ -106,7 +106,7 @@ Le système utilise un contexte d'authentification minimal :
 ## 📊 Modules Disponibles
 
 ### 🚨 Sinistres
-- Types : RC100, RC50, RC25, RC0, bris de glace, vol, incendie
+- Types : RC100, RC50, RC0, bris de glace, vol, incendie
 - Responsabilité et pourcentage
 - Statuts : En cours, Résolu, Refusé, En attente
 

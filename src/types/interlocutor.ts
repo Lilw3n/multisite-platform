@@ -74,7 +74,7 @@ export interface Claim {
   interlocutorId: string;
   vehicleId?: string;
   driverId?: string;
-  type: 'materialRC100' | 'materialRC50' | 'materialRC25' | 'materialRC0' | 'bodilyRC100' | 'bodilyRC50' | 'bodilyRC25' | 'bodilyRC0' | 'glassBreakage' | 'theft' | 'fire' | 'naturalDisaster';
+  type: 'materialRC100' | 'materialRC50' | 'materialRC0' | 'bodilyRC100' | 'bodilyRC50' | 'bodilyRC0' | 'glassBreakage' | 'theft' | 'fire' | 'naturalDisaster';
   date: string;
   amount: number;
   description: string;

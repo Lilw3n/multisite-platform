@@ -108,11 +108,9 @@ export default function UnifiedDataForm({
   const claimTypes = [
     { value: 'materialRC100', label: 'Matériel RC 100%' },
     { value: 'materialRC50', label: 'Matériel RC 50%' },
-    { value: 'materialRC25', label: 'Matériel RC 25%' },
     { value: 'materialRC0', label: 'Matériel RC 0%' },
     { value: 'bodilyRC100', label: 'Corporel RC 100%' },
     { value: 'bodilyRC50', label: 'Corporel RC 50%' },
-    { value: 'bodilyRC25', label: 'Corporel RC 25%' },
     { value: 'bodilyRC0', label: 'Corporel RC 0%' },
     { value: 'glassBreakage', label: 'Bris de glace' },
     { value: 'theft', label: 'Vol' },

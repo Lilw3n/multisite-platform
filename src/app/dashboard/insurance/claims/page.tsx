@@ -124,11 +124,9 @@ export default function ClaimsPage() {
     const types = {
       materialRC100: 'Matériel RC 100%',
       materialRC50: 'Matériel RC 50%',
-      materialRC25: 'Matériel RC 25%',
       materialRC0: 'Matériel RC 0%',
       bodilyRC100: 'Corporel RC 100%',
       bodilyRC50: 'Corporel RC 50%',
-      bodilyRC25: 'Corporel RC 25%',
       bodilyRC0: 'Corporel RC 0%',
       glassBreakage: 'Bris de glace',
       theft: 'Vol',

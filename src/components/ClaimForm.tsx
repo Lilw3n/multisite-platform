@@ -88,6 +88,8 @@ export default function ClaimForm({
       setFormData(prev => ({ ...prev, [name]: checked }));
     } else if (type === 'number') {
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+    } else if (name === 'percentage') {
+      setFormData(prev => ({ ...prev, [name]: parseInt(value) }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -259,15 +261,16 @@ export default function ClaimForm({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Pourcentage de responsabilité (%)
             </label>
-            <input
-              type="number"
+            <select
               name="percentage"
               value={formData.percentage}
               onChange={handleChange}
-              min="0"
-              max="100"
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+            >
+              <option value={0}>0%</option>
+              <option value={50}>50%</option>
+              <option value={100}>100%</option>
+            </select>
           </div>
 
           {/* ID Véhicule */}

@@ -78,6 +78,8 @@ export default function LiveStreamingSystem({
   const [showChat, setShowChat] = useState(true);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [showStudio, setShowStudio] = useState(false);
+  const [showProfiles, setShowProfiles] = useState(false);
 
   useEffect(() => {
     loadStreams();
@@ -539,6 +541,57 @@ export default function LiveStreamingSystem({
     );
   }
 
+  // Studio de streaming
+  if (showStudio) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">Studio de Streaming</h2>
+          <button
+            onClick={() => setShowStudio(false)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            ← Retour aux lives
+          </button>
+        </div>
+        <ProfessionalStreamingStudio
+          userId="current-user"
+          onStreamStart={(streamId) => {
+            console.log('Stream démarré:', streamId);
+            setShowStudio(false);
+            onStartStream?.();
+          }}
+          onStreamEnd={(streamId) => {
+            console.log('Stream arrêté:', streamId);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Annuaire des profils streamers
+  if (showProfiles) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">Streamers de la Communauté</h2>
+          <button
+            onClick={() => setShowProfiles(false)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            ← Retour aux lives
+          </button>
+        </div>
+        <ProfileDirectory
+          showSearch={true}
+          showFilters={true}
+          layout="grid"
+          limit={12}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -549,13 +602,22 @@ export default function LiveStreamingSystem({
         </div>
         
         {userRole !== 'guest' && (
-          <button
-            onClick={onStartStream}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
-          >
-            <Play className="w-5 h-5" />
-            <span>Démarrer un live</span>
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => setShowStudio(true)}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
+            >
+              <Play className="w-5 h-5" />
+              <span>Démarrer un live</span>
+            </button>
+            <button
+              onClick={() => setShowProfiles(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
+            >
+              <Users className="w-5 h-5" />
+              <span>Streamers</span>
+            </button>
+          </div>
         )}
       </div>
 

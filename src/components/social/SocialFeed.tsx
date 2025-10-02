@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Play, Pause, Volume2, VolumeX, User, Verified, TrendingUp, Star } from 'lucide-react';
+import UserProfileCard from '../profile/UserProfileCard';
+import UserProfileModal from '../profile/UserProfileModal';
+import { ProfileService } from '@/lib/profileService';
+import { UserProfile } from '@/types/profile';
+import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Play, Pause, Volume2, VolumeX, User, Verified, TrendingUp, Star, Users, Eye } from 'lucide-react';
 
 interface SocialPost {
   id: string;
@@ -66,10 +70,19 @@ export default function SocialFeed({ userRole = 'guest', onLeadGenerated }: Soci
   const [isLoading, setIsLoading] = useState(true);
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const [mutedVideos, setMutedVideos] = useState<Set<string>>(new Set());
+  const [profiles, setProfiles] = useState<UserProfile[]>([]);
+  const [selectedProfile, setSelectedProfile] = useState<UserProfile | null>(null);
+  const [showProfiles, setShowProfiles] = useState(false);
 
   useEffect(() => {
     loadPosts();
+    loadProfiles();
   }, []);
+
+  const loadProfiles = () => {
+    const loadedProfiles = ProfileService.loadProfiles();
+    setProfiles(loadedProfiles.slice(0, 6)); // Afficher les 6 premiers profils
+  };
 
   const loadPosts = async () => {
     setIsLoading(true);
@@ -588,6 +601,46 @@ export default function SocialFeed({ userRole = 'guest', onLeadGenerated }: Soci
           </div>
         </div>
       ))}
+
+      {/* Section profils recommandés */}
+      {profiles.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+              <Users className="h-5 w-5 text-blue-600" />
+              <span>Membres à découvrir</span>
+            </h3>
+            <button
+              onClick={() => setShowProfiles(true)}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Voir tous →
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {profiles.map((profile) => (
+              <UserProfileCard
+                key={profile.id}
+                profile={profile}
+                onClick={() => setSelectedProfile(profile)}
+                compact={true}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+
+    {/* Modal de profil */}
+    {selectedProfile && (
+      <UserProfileModal
+        profile={selectedProfile}
+        isOpen={!!selectedProfile}
+        onClose={() => setSelectedProfile(null)}
+        currentUserId="current-user"
+      />
+    )}
     </div>
   );
 }

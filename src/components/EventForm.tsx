@@ -478,8 +478,7 @@ export default function EventForm({ interlocutorId, onSuccess, onCancel, existin
                     value={url.url}
                     onChange={(e) => handleUrlChange(index, 'url', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://exemple.com"
-                    required
+                    placeholder="https://exemple.com (optionnel)"
                   />
                 </div>
               ))}

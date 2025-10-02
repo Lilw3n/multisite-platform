@@ -108,6 +108,9 @@ export default function SmartEventsTimeline({
   }, [events, activeFilters, searchQuery, selectedTags, timeRange]);
 
   const loadEvents = () => {
+    // Forcer régénération pour test (à supprimer en prod)
+    SmartEventsService.forceRegenerate();
+    
     // Charger événements existants ou générer démo
     let allEvents = SmartEventsService.getAllEvents();
     if (allEvents.length === 0) {
@@ -515,11 +518,14 @@ export default function SmartEventsTimeline({
             className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
           >
             <option value="createdAt">Date création</option>
-            <option value="scheduledAt">Date prévue</option>
+            <option value="scheduledAt">Date événement (choisie)</option>
+            <option value="executedAt">Date exécution</option>
             <option value="priority">Priorité</option>
             <option value="engagement">Engagement</option>
             <option value="riskScore">Score risque</option>
             <option value="opportunityScore">Score opportunité</option>
+            <option value="views">Nombre de vues</option>
+            <option value="responseTime">Temps de réponse</option>
           </select>
           <button
             onClick={() => setActiveFilters({
@@ -759,6 +765,164 @@ export default function SmartEventsTimeline({
           </div>
         </div>
       )}
+
+      {/* Barre de recherche principale (toujours visible) */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex-1 relative">
+            <Search className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="🔍 Rechercher événements par mots-clés, hashtags, participants..."
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+            />
+          </div>
+          
+          <button
+            onClick={() => setSemanticSearch(!semanticSearch)}
+            className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+              semanticSearch 
+                ? 'bg-purple-100 text-purple-700 border-2 border-purple-300' 
+                : 'bg-gray-100 text-gray-700 border-2 border-gray-300 hover:bg-gray-200'
+            }`}
+            title={semanticSearch ? 'Recherche IA activée' : 'Recherche classique'}
+          >
+            {semanticSearch ? (
+              <>
+                <Brain className="h-5 w-5 mr-2" />
+                IA
+              </>
+            ) : (
+              <>
+                <Search className="h-5 w-5 mr-2" />
+                Classique
+              </>
+            )}
+          </button>
+          
+          <div className="flex items-center space-x-2">
+            <label className="text-sm font-medium text-gray-700">Trier par:</label>
+            <select
+              value={activeFilters.sorting?.primary.field || 'createdAt'}
+              onChange={(e) => setActiveFilters({
+                ...activeFilters,
+                sorting: {
+                  primary: {
+                    field: e.target.value as any,
+                    direction: activeFilters.sorting?.primary.direction || 'desc'
+                  }
+                }
+              })}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="createdAt">📅 Date création</option>
+              <option value="scheduledAt">🗓️ Date événement</option>
+              <option value="executedAt">✅ Date exécution</option>
+              <option value="priority">🚨 Priorité</option>
+              <option value="engagement">💬 Engagement</option>
+              <option value="riskScore">⚠️ Score risque</option>
+              <option value="opportunityScore">🎯 Opportunité</option>
+            </select>
+            
+            <button
+              onClick={() => setActiveFilters({
+                ...activeFilters,
+                sorting: {
+                  primary: {
+                    field: activeFilters.sorting?.primary.field || 'createdAt',
+                    direction: activeFilters.sorting?.primary.direction === 'desc' ? 'asc' : 'desc'
+                  }
+                }
+              })}
+              className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center justify-center"
+              title={`Tri ${activeFilters.sorting?.primary.direction === 'desc' ? 'décroissant' : 'croissant'}`}
+            >
+              {activeFilters.sorting?.primary.direction === 'desc' ? 
+                <SortDesc className="h-4 w-4" /> : 
+                <SortAsc className="h-4 w-4" />
+              }
+            </button>
+          </div>
+        </div>
+        
+        {/* Tags populaires (toujours visibles) */}
+        {popularTags.length > 0 && (
+          <div className="mt-4">
+            <div className="flex items-center space-x-2 mb-2">
+              <Hash className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Tags populaires:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {popularTags.slice(0, 8).map(({ tag, count }) => (
+                <button
+                  key={tag}
+                  onClick={() => {
+                    if (selectedTags.includes(tag)) {
+                      setSelectedTags(selectedTags.filter(t => t !== tag));
+                    } else {
+                      setSelectedTags([...selectedTags, tag]);
+                    }
+                  }}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                    selectedTags.includes(tag)
+                      ? 'bg-blue-500 text-white shadow-md transform scale-105'
+                      : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-blue-50 hover:border-blue-300'
+                  }`}
+                >
+                  {tag} <span className="opacity-75">({count})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Filtres rapides */}
+        <div className="mt-4 flex items-center space-x-4">
+          <span className="text-sm font-medium text-gray-700">Filtres rapides:</span>
+          
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value as any)}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="today">📅 Aujourd'hui</option>
+            <option value="week">📅 Cette semaine</option>
+            <option value="month">📅 Ce mois</option>
+            <option value="quarter">📅 Ce trimestre</option>
+            <option value="year">📅 Cette année</option>
+            <option value="all">📅 Tout</option>
+          </select>
+          
+          <select
+            value={groupBy}
+            onChange={(e) => setGroupBy(e.target.value as any)}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="none">🔄 Pas de groupement</option>
+            <option value="date">📅 Grouper par date</option>
+            <option value="type">📋 Grouper par type</option>
+            <option value="participant">👥 Grouper par participant</option>
+            <option value="sentiment">😊 Grouper par sentiment</option>
+            <option value="priority">🚨 Grouper par priorité</option>
+          </select>
+          
+          {(searchQuery || selectedTags.length > 0 || timeRange !== 'week') && (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedTags([]);
+                setTimeRange('week');
+                setActiveFilters({ sorting: { primary: { field: 'createdAt', direction: 'desc' } } });
+              }}
+              className="px-3 py-1 bg-red-100 text-red-700 rounded-md text-sm hover:bg-red-200 transition-colors"
+            >
+              🗑️ Effacer filtres
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Contenu principal */}
       <div className={showFilters ? 'lg:col-span-3' : ''}>

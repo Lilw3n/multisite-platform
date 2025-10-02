@@ -45,7 +45,7 @@ export class SmartEventsService {
       
       timestamps: {
         createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(), // Il y a 2h
-        scheduledAt: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(), // Dans 24h
+        scheduledAt: new Date('2025-09-15T14:30:00').toISOString(), // 15 septembre 2025 à 14h30
         lastModified: new Date(now.getTime() - 30 * 60 * 1000).toISOString()
       },
       
@@ -195,6 +195,7 @@ export class SmartEventsService {
       
       timestamps: {
         createdAt: new Date(now.getTime() - 45 * 60 * 1000).toISOString(), // Il y a 45min
+        scheduledAt: new Date('2025-09-15T09:00:00').toISOString(), // 15 septembre 2025 à 9h00
         lastModified: new Date(now.getTime() - 45 * 60 * 1000).toISOString()
       },
       
@@ -341,7 +342,8 @@ export class SmartEventsService {
       
       timestamps: {
         createdAt: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(), // Hier
-        scheduledAt: new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString(), // Dans 2 jours
+        scheduledAt: new Date('2025-09-15T16:00:00').toISOString(), // 15 septembre 2025 à 16h00
+        executedAt: new Date('2025-09-15T16:15:00').toISOString(), // Exécuté avec 15min de retard
         lastModified: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString()
       },
       
@@ -486,6 +488,253 @@ export class SmartEventsService {
       
       system: {
         source: 'manual',
+        version: 1,
+        isArchived: false,
+        isDeleted: false,
+        permissions: {
+          visibility: 'internal',
+          canView: ['user_internal_1'],
+          canEdit: ['user_internal_1'],
+          canDelete: ['user_internal_1'],
+          canShare: ['user_internal_1']
+        },
+        auditTrail: []
+      }
+    });
+
+    // Événement 4: Appel téléphonique - date différente
+    events.push({
+      id: `event_${Date.now()}_4`,
+      title: "📞 Appel de suivi - Devis auto",
+      description: "Suivi téléphonique pour devis assurance auto particulier",
+      content: "Appel de M. MARTIN pour discuter des options de son devis auto. Intéressé par la formule tous risques. #Auto #Suivi #Particulier",
+      
+      timestamps: {
+        createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(), // Il y a 3 jours
+        scheduledAt: new Date('2025-09-16T10:30:00').toISOString(), // 16 septembre 2025 à 10h30
+        lastModified: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      
+      participants: {
+        creator: {
+          id: 'user_internal_1',
+          name: 'Diddy (Vous)',
+          role: 'creator',
+          type: 'internal'
+        },
+        recipients: [{
+          id: 'user_client_3',
+          name: 'Pierre MARTIN',
+          phone: '+33123456789',
+          role: 'recipient',
+          type: 'external',
+          responseStatus: 'pending'
+        }],
+        mentions: [],
+        watchers: []
+      },
+      
+      classification: {
+        type: 'sales',
+        subType: 'follow_up',
+        category: 'call',
+        priority: 'normal',
+        urgency: 'this_week',
+        sentiment: 'positive',
+        businessImpact: 'medium'
+      },
+      
+      channels: {
+        primary: {
+          type: 'call',
+          identifier: '+33123456789'
+        },
+        deliveryStatus: {}
+      },
+      
+      enrichment: {
+        hashtags: ['#Auto', '#Suivi', '#Particulier'],
+        keywords: ['suivi', 'devis', 'auto', 'tous risques', 'particulier'],
+        entities: [
+          { type: 'person', value: 'M. MARTIN', confidence: 0.95, startIndex: 8, endIndex: 17 }
+        ],
+        topics: ['suivi', 'devis', 'auto', 'assurance'],
+        language: 'fr',
+        readingTime: 1
+      },
+      
+      relationships: {
+        childEvents: [],
+        relatedEvents: [],
+        triggers: []
+      },
+      
+      tracking: {
+        views: 2,
+        interactions: 1,
+        responses: [],
+        engagement: {
+          engagementScore: 70
+        },
+        conversionEvents: []
+      },
+      
+      aiInsights: {
+        predictedOutcome: 'Probabilité conversion moyenne (65%) - Client intéressé',
+        recommendedActions: [
+          {
+            id: 'rec_7',
+            type: 'action',
+            title: 'Préparer comparatif formules',
+            description: 'Présenter les différences entre formules pour faciliter choix',
+            confidence: 0.80,
+            priority: 'normal',
+            estimatedImpact: 'Aide à la décision client'
+          }
+        ],
+        similarEvents: [],
+        riskScore: 30,
+        opportunityScore: 65,
+        nextBestAction: 'Envoyer comparatif par email avant l\'appel'
+      },
+      
+      workflow: {
+        status: 'scheduled',
+        stage: 'follow_up',
+        nextSteps: [],
+        automationRules: []
+      },
+      
+      attachments: [],
+      
+      system: {
+        source: 'manual',
+        version: 1,
+        isArchived: false,
+        isDeleted: false,
+        permissions: {
+          visibility: 'internal',
+          canView: ['user_internal_1'],
+          canEdit: ['user_internal_1'],
+          canDelete: ['user_internal_1'],
+          canShare: ['user_internal_1']
+        },
+        auditTrail: []
+      }
+    });
+
+    // Événement 5: Email de relance - autre date
+    events.push({
+      id: `event_${Date.now()}_5`,
+      title: "📧 Relance devis habitation",
+      description: "Email de relance pour devis assurance habitation",
+      content: "Relance client pour devis habitation envoyé il y a une semaine. Aucune réponse reçue. #Habitation #Relance #Email",
+      
+      timestamps: {
+        createdAt: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(), // Il y a 1h
+        scheduledAt: new Date('2025-09-14T11:00:00').toISOString(), // 14 septembre 2025 à 11h00
+        executedAt: new Date('2025-09-14T11:05:00').toISOString(), // Exécuté à l'heure
+        lastModified: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString()
+      },
+      
+      participants: {
+        creator: {
+          id: 'user_internal_1',
+          name: 'Diddy (Vous)',
+          role: 'creator',
+          type: 'internal'
+        },
+        recipients: [{
+          id: 'user_client_4',
+          name: 'Marie DUPUIS',
+          email: 'marie.dupuis@email.fr',
+          role: 'recipient',
+          type: 'external',
+          responseStatus: 'read'
+        }],
+        mentions: [],
+        watchers: []
+      },
+      
+      classification: {
+        type: 'marketing',
+        subType: 'follow_up',
+        category: 'email',
+        priority: 'low',
+        urgency: 'can_wait',
+        sentiment: 'neutral',
+        businessImpact: 'low'
+      },
+      
+      channels: {
+        primary: {
+          type: 'email',
+          identifier: 'marie.dupuis@email.fr'
+        },
+        deliveryStatus: {
+          'user_client_4': {
+            status: 'read',
+            timestamp: new Date('2025-09-14T11:30:00').toISOString()
+          }
+        }
+      },
+      
+      enrichment: {
+        hashtags: ['#Habitation', '#Relance', '#Email'],
+        keywords: ['relance', 'devis', 'habitation', 'semaine'],
+        entities: [],
+        topics: ['relance', 'habitation', 'devis'],
+        language: 'fr',
+        readingTime: 1
+      },
+      
+      relationships: {
+        childEvents: [],
+        relatedEvents: [],
+        triggers: []
+      },
+      
+      tracking: {
+        views: 1,
+        interactions: 1,
+        responses: [],
+        engagement: {
+          engagementScore: 45,
+          timeToResponse: 25 // 25 minutes pour lire
+        },
+        conversionEvents: []
+      },
+      
+      aiInsights: {
+        predictedOutcome: 'Faible probabilité conversion (30%) - Pas de réponse',
+        recommendedActions: [
+          {
+            id: 'rec_8',
+            type: 'action',
+            title: 'Changer de canal',
+            description: 'Essayer contact téléphonique au lieu d\'email',
+            confidence: 0.75,
+            priority: 'low',
+            estimatedImpact: 'Peut relancer l\'intérêt'
+          }
+        ],
+        similarEvents: [],
+        riskScore: 60,
+        opportunityScore: 30,
+        nextBestAction: 'Attendre 3 jours puis appel téléphonique'
+      },
+      
+      workflow: {
+        status: 'completed',
+        stage: 'follow_up',
+        nextSteps: [],
+        automationRules: []
+      },
+      
+      attachments: [],
+      
+      system: {
+        source: 'email_sync',
         version: 1,
         isArchived: false,
         isDeleted: false,
@@ -732,6 +981,12 @@ export class SmartEventsService {
     return stored ? JSON.parse(stored) : [];
   }
 
+  // Forcer la régénération des événements (pour test)
+  static forceRegenerate(): void {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(this.STORAGE_KEY);
+  }
+
   static getEventById(id: string): SmartEvent | null {
     const events = this.getAllEvents();
     return events.find(e => e.id === id) || null;
@@ -855,6 +1110,10 @@ export class SmartEventsService {
             aValue = a.timestamps.scheduledAt ? new Date(a.timestamps.scheduledAt).getTime() : 0;
             bValue = b.timestamps.scheduledAt ? new Date(b.timestamps.scheduledAt).getTime() : 0;
             break;
+          case 'executedAt':
+            aValue = a.timestamps.executedAt ? new Date(a.timestamps.executedAt).getTime() : 0;
+            bValue = b.timestamps.executedAt ? new Date(b.timestamps.executedAt).getTime() : 0;
+            break;
           case 'priority':
             const priorityOrder = { low: 1, normal: 2, high: 3, urgent: 4, critical: 5 };
             aValue = priorityOrder[a.classification.priority];
@@ -871,6 +1130,14 @@ export class SmartEventsService {
           case 'opportunityScore':
             aValue = a.aiInsights.opportunityScore;
             bValue = b.aiInsights.opportunityScore;
+            break;
+          case 'views':
+            aValue = a.tracking.views;
+            bValue = b.tracking.views;
+            break;
+          case 'responseTime':
+            aValue = a.tracking.engagement.timeToResponse || 999999;
+            bValue = b.tracking.engagement.timeToResponse || 999999;
             break;
           default:
             aValue = 0;

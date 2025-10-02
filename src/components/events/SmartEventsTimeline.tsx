@@ -107,17 +107,156 @@ export default function SmartEventsTimeline({
     applyFilters();
   }, [events, activeFilters, searchQuery, selectedTags, timeRange]);
 
-  const loadEvents = () => {
-    // Forcer régénération pour test (à supprimer en prod)
-    SmartEventsService.forceRegenerate();
+  // Fonction pour convertir les anciens événements au format SmartEvent
+  const convertLegacyEventToSmartEvent = (oldEvent: any, interlocutorId: string): SmartEvent => {
+    const now = new Date();
     
-    // Charger événements existants ou générer démo
-    let allEvents = SmartEventsService.getAllEvents();
-    if (allEvents.length === 0) {
-      allEvents = SmartEventsService.generateDemoEvents();
-      allEvents.forEach(event => SmartEventsService.saveEvent(event));
+    return {
+      id: oldEvent.id || `legacy_${Date.now()}_${Math.random()}`,
+      title: oldEvent.title || 'Événement',
+      description: oldEvent.description || '',
+      content: oldEvent.description || '',
+      
+      timestamps: {
+        createdAt: oldEvent.createdAt || now.toISOString(),
+        scheduledAt: oldEvent.date ? `${oldEvent.date}T${oldEvent.time || '00:00'}:00` : undefined,
+        executedAt: oldEvent.status === 'completed' ? oldEvent.createdAt : undefined,
+        lastModified: oldEvent.createdAt || now.toISOString()
+      },
+      
+      participants: {
+        creator: {
+          id: oldEvent.createdBy || 'user_internal_1',
+          name: oldEvent.createdBy || 'Utilisateur',
+          role: 'creator',
+          type: 'internal'
+        },
+        recipients: oldEvent.participants?.map((p: any) => ({
+          id: `participant_${p.name.replace(/\s+/g, '_')}`,
+          name: p.name,
+          role: p.role || 'recipient',
+          type: 'external',
+          responseStatus: 'pending'
+        })) || [],
+        mentions: [],
+        watchers: []
+      },
+      
+      classification: {
+        type: oldEvent.type === 'call' ? 'communication' : 
+              oldEvent.type === 'email' ? 'communication' : 
+              oldEvent.type === 'meeting' ? 'sales' : 'communication',
+        subType: oldEvent.type,
+        category: oldEvent.type as any || 'note',
+        priority: oldEvent.priority as any || 'normal',
+        urgency: oldEvent.priority === 'high' ? 'today' : 'this_week',
+        sentiment: 'neutral',
+        businessImpact: oldEvent.priority === 'high' ? 'high' : 'medium'
+      },
+      
+      channels: {
+        primary: {
+          type: oldEvent.type as any || 'note',
+          identifier: oldEvent.type === 'email' ? 'email' : oldEvent.type === 'call' ? 'phone' : 'internal'
+        },
+        deliveryStatus: {}
+      },
+      
+      enrichment: {
+        hashtags: [],
+        keywords: oldEvent.title ? oldEvent.title.toLowerCase().split(' ').filter(w => w.length > 3) : [],
+        entities: [],
+        topics: [oldEvent.type || 'general'],
+        language: 'fr',
+        readingTime: 1
+      },
+      
+      relationships: {
+        childEvents: [],
+        relatedEvents: [],
+        triggers: []
+      },
+      
+      tracking: {
+        views: 1,
+        interactions: 0,
+        responses: [],
+        engagement: {
+          engagementScore: 50
+        },
+        conversionEvents: []
+      },
+      
+      aiInsights: {
+        predictedOutcome: 'Événement legacy - analyse limitée',
+        recommendedActions: [],
+        similarEvents: [],
+        riskScore: 20,
+        opportunityScore: 50,
+        nextBestAction: 'Analyser avec les nouveaux outils'
+      },
+      
+      workflow: {
+        status: oldEvent.status === 'completed' ? 'completed' : 
+                oldEvent.status === 'pending' ? 'in_progress' : 'draft',
+        stage: 'legacy',
+        nextSteps: [],
+        automationRules: []
+      },
+      
+      attachments: oldEvent.attachments?.map((att: any) => ({
+        id: att.id || `att_${Date.now()}`,
+        name: att.name || 'Document',
+        type: att.type || 'document',
+        url: att.url || '#',
+        size: att.size,
+        mimeType: att.mimeType
+      })) || [],
+      
+      system: {
+        source: 'manual',
+        version: 1,
+        isArchived: false,
+        isDeleted: false,
+        permissions: {
+          visibility: 'internal',
+          canView: [interlocutorId],
+          canEdit: [interlocutorId],
+          canDelete: [interlocutorId],
+          canShare: [interlocutorId]
+        },
+        auditTrail: []
+      }
+    };
+  };
+
+  const loadEvents = () => {
+    // Charger les nouveaux événements SmartEvents (sans forcer la régénération)
+    let smartEvents = SmartEventsService.getAllEvents();
+    if (smartEvents.length === 0) {
+      smartEvents = SmartEventsService.generateDemoEvents();
+      smartEvents.forEach(event => SmartEventsService.saveEvent(event));
     }
     
+    // Charger les anciens événements depuis l'interlocuteur si disponible
+    let legacyEvents: SmartEvent[] = [];
+    if (interlocutorId && typeof window !== 'undefined') {
+      try {
+        // Importer le service d'interlocuteurs pour récupérer les anciens événements
+        const InterlocutorService = require('@/lib/interlocutors').InterlocutorService;
+        const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
+        
+        if (interlocutor && interlocutor.events) {
+          // Convertir les anciens événements au format SmartEvent
+          legacyEvents = interlocutor.events.map((oldEvent: any) => convertLegacyEventToSmartEvent(oldEvent, interlocutorId));
+        }
+      } catch (error) {
+        console.warn('Impossible de charger les anciens événements:', error);
+      }
+    }
+    
+    // Fusionner tous les événements
+    const allEvents = [...smartEvents, ...legacyEvents];
     setEvents(allEvents);
     
     // Générer analytics
@@ -175,16 +314,60 @@ export default function SmartEventsTimeline({
       if (semanticSearch) {
         filtered = SmartEventsService.semanticSearch(searchQuery, filtered);
       } else {
-        const query = searchQuery.toLowerCase();
-        filtered = filtered.filter(e => 
-          e.title.toLowerCase().includes(query) ||
-          e.description?.toLowerCase().includes(query) ||
-          e.content?.toLowerCase().includes(query) ||
-          e.enrichment.keywords.some(k => k.toLowerCase().includes(query)) ||
-          e.enrichment.hashtags.some(h => h.toLowerCase().includes(query)) ||
-          e.participants.creator.name.toLowerCase().includes(query) ||
-          e.participants.recipients.some(r => r.name.toLowerCase().includes(query))
-        );
+        const query = searchQuery.toLowerCase().trim();
+        const queryWords = query.split(' ').filter(word => word.length > 1);
+        
+        filtered = filtered.filter(e => {
+          // Recherche dans le titre
+          const titleMatch = e.title.toLowerCase().includes(query);
+          
+          // Recherche dans la description
+          const descriptionMatch = e.description?.toLowerCase().includes(query) || false;
+          
+          // Recherche dans le contenu
+          const contentMatch = e.content?.toLowerCase().includes(query) || false;
+          
+          // Recherche dans les mots-clés
+          const keywordMatch = e.enrichment.keywords.some(k => 
+            k.toLowerCase().includes(query) || 
+            queryWords.some(word => k.toLowerCase().includes(word))
+          );
+          
+          // Recherche dans les hashtags
+          const hashtagMatch = e.enrichment.hashtags.some(h => 
+            h.toLowerCase().includes(query) ||
+            h.toLowerCase().replace('#', '').includes(query.replace('#', ''))
+          );
+          
+          // Recherche dans les participants
+          const creatorMatch = e.participants.creator.name.toLowerCase().includes(query);
+          const recipientMatch = e.participants.recipients.some(r => 
+            r.name.toLowerCase().includes(query) ||
+            r.email?.toLowerCase().includes(query) ||
+            r.phone?.includes(query.replace(/\s+/g, ''))
+          );
+          
+          // Recherche dans les topics
+          const topicMatch = e.enrichment.topics.some(t => 
+            t.toLowerCase().includes(query) ||
+            queryWords.some(word => t.toLowerCase().includes(word))
+          );
+          
+          // Recherche par type d'événement
+          const typeMatch = e.classification.type.toLowerCase().includes(query) ||
+                           e.classification.category.toLowerCase().includes(query) ||
+                           e.classification.subType?.toLowerCase().includes(query);
+          
+          // Recherche par sentiment
+          const sentimentMatch = e.classification.sentiment.toLowerCase().includes(query);
+          
+          // Recherche par priorité
+          const priorityMatch = e.classification.priority.toLowerCase().includes(query);
+          
+          return titleMatch || descriptionMatch || contentMatch || keywordMatch || 
+                 hashtagMatch || creatorMatch || recipientMatch || topicMatch || 
+                 typeMatch || sentimentMatch || priorityMatch;
+        });
       }
     }
     
@@ -403,6 +586,63 @@ export default function SmartEventsTimeline({
               <p className="text-xs text-purple-700">
                 {event.aiInsights.recommendedActions[0].title}
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Boutons d'action pour événements legacy */}
+      {event.workflow.stage === 'legacy' && (
+        <div className="mt-3 pt-3 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-500">Actions:</span>
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Logique pour lier l'événement
+                  console.log('Lier événement:', event.id);
+                }}
+                className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                title="Lier à un autre événement"
+              >
+                🔗 Lier
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Logique pour délier l'événement
+                  console.log('Délier événement:', event.id);
+                }}
+                className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors"
+                title="Délier l'événement"
+              >
+                🔓 Délier
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Logique pour modifier l'événement
+                  console.log('Modifier événement:', event.id);
+                }}
+                className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                title="Modifier l'événement"
+              >
+                ✏️ Modifier
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Logique pour supprimer l'événement
+                  if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
+                    console.log('Supprimer événement:', event.id);
+                  }
+                }}
+                className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                title="Supprimer l'événement"
+              >
+                🗑️ Supprimer
+              </button>
             </div>
           </div>
         </div>

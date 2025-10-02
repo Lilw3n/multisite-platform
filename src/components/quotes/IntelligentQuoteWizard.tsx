@@ -57,22 +57,6 @@ export default function IntelligentQuoteWizard({
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [selectedCompany, setSelectedCompany] = useState<any>(null);
 
-  useEffect(() => {
-    initializeSession();
-  }, [sessionId, interlocutorId]);
-
-  useEffect(() => {
-    if (session) {
-      updateSteps();
-    }
-  }, [session?.id, updateSteps]); // Utiliser la fonction useCallback
-
-  useEffect(() => {
-    if (session) {
-      analyzeInRealTime();
-    }
-  }, [session?.id, analyzeInRealTime]); // Utiliser la fonction useCallback
-
   const initializeSession = () => {
     let currentSession: IntelligentQuoteSession;
     
@@ -280,6 +264,23 @@ export default function IntelligentQuoteWizard({
       setIsLoading(false);
     }
   };
+
+  // useEffect hooks après toutes les définitions de fonctions
+  useEffect(() => {
+    initializeSession();
+  }, [sessionId, interlocutorId]);
+
+  useEffect(() => {
+    if (session) {
+      updateSteps();
+    }
+  }, [session?.id, updateSteps]);
+
+  useEffect(() => {
+    if (session) {
+      analyzeInRealTime();
+    }
+  }, [session?.id, analyzeInRealTime]);
 
   const renderQuestion = (question: Question) => {
     const value = answers[question.id];
@@ -815,3 +816,4 @@ export default function IntelligentQuoteWizard({
     </div>
   );
 }
+

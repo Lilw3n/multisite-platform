@@ -933,123 +933,126 @@ export default function InterlocutorDetailPage() {
                           <span className="mr-2">📅</span>
                           Événements ({interlocutor.events.length})
                         </h3>
-                <button
-                          onClick={() => setShowEventForm(true)}
+                        <button
+                          onClick={() => {
+                            // Créer un nouvel événement SmartEvent directement
+                            const newEvent = {
+                              id: `event_${Date.now()}`,
+                              title: 'Nouvel événement',
+                              description: 'Cliquez pour modifier',
+                              content: '',
+                              timestamps: {
+                                createdAt: new Date().toISOString(),
+                                scheduledAt: new Date().toISOString(),
+                                lastModified: new Date().toISOString()
+                              },
+                              participants: {
+                                creator: {
+                                  id: 'user_internal_1',
+                                  name: 'Diddy (Vous)',
+                                  role: 'creator' as const,
+                                  type: 'internal' as const
+                                },
+                                recipients: [{
+                                  id: interlocutor.id,
+                                  name: interlocutor.name,
+                                  role: 'recipient' as const,
+                                  type: 'external' as const,
+                                  responseStatus: 'pending' as const
+                                }],
+                                mentions: [],
+                                watchers: []
+                              },
+                              classification: {
+                                type: 'communication' as const,
+                                subType: 'note',
+                                category: 'note' as const,
+                                priority: 'normal' as const,
+                                urgency: 'this_week' as const,
+                                sentiment: 'neutral' as const,
+                                businessImpact: 'medium' as const
+                              },
+                              channels: {
+                                primary: {
+                                  type: 'note' as const,
+                                  identifier: 'internal'
+                                },
+                                deliveryStatus: {}
+                              },
+                              enrichment: {
+                                hashtags: [],
+                                keywords: ['nouvel', 'événement'],
+                                entities: [],
+                                topics: ['général'],
+                                language: 'fr',
+                                readingTime: 1
+                              },
+                              relationships: {
+                                childEvents: [],
+                                relatedEvents: [],
+                                triggers: []
+                              },
+                              tracking: {
+                                views: 0,
+                                interactions: 0,
+                                responses: [],
+                                engagement: {
+                                  engagementScore: 50
+                                },
+                                conversionEvents: []
+                              },
+                              aiInsights: {
+                                predictedOutcome: 'Nouvel événement à configurer',
+                                recommendedActions: [],
+                                similarEvents: [],
+                                riskScore: 10,
+                                opportunityScore: 50,
+                                nextBestAction: 'Modifier les détails'
+                              },
+                              workflow: {
+                                status: 'draft' as const,
+                                stage: 'creation',
+                                nextSteps: [],
+                                automationRules: []
+                              },
+                              attachments: [],
+                              system: {
+                                source: 'manual' as const,
+                                version: 1,
+                                isArchived: false,
+                                isDeleted: false,
+                                permissions: {
+                                  visibility: 'internal' as const,
+                                  canView: [interlocutor.id],
+                                  canEdit: [interlocutor.id],
+                                  canDelete: [interlocutor.id],
+                                  canShare: [interlocutor.id]
+                                },
+                                auditTrail: []
+                              }
+                            };
+                            
+                            // Sauvegarder dans SmartEventsService
+                            const SmartEventsService = require('@/lib/smartEventsService').SmartEventsService;
+                            SmartEventsService.saveEvent(newEvent);
+                            
+                            // Rafraîchir la page
+                            window.location.reload();
+                          }}
                           className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs font-medium"
                         >
                           + Ajouter
                         </button>
                       </div>
                       <div className="p-2 max-h-[70vh] overflow-y-auto">
-                        {/* Timeline intelligente des événements */}
+                        {/* Timeline intelligente des événements - SYSTÈME UNIFIÉ */}
                         <SmartEventsTimeline 
                           interlocutorId={interlocutor.id}
                           showAnalytics={false}
-                          maxEvents={20}
+                          maxEvents={50}
                           autoRefresh={true}
                         />
-                        
-                        {/* Ancienne liste d'événements (fallback) */}
-                        <div className="space-y-2 mt-4">
-                          {interlocutor.events.map((event) => (
-                            <div key={event.id} className="border border-gray-200 rounded-lg p-2 hover:shadow-md transition-shadow bg-gradient-to-r from-gray-50 to-white">
-                              <div className="flex items-start space-x-2">
-                                <span className="text-lg flex-shrink-0">
-                                  {event.type === 'call' && '📞'}
-                                  {event.type === 'email' && '📧'}
-                                  {event.type === 'meeting' && '🤝'}
-                                  {event.type === 'task' && '✅'}
-                                  {event.type === 'note' && '📝'}
-                                </span>
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-1">{event.title}</h4>
-                                  <p className="text-sm text-gray-600 mb-3 leading-relaxed">{event.description}</p>
-                                  
-                                  {/* Participants */}
-                                  <div className="mb-3">
-                                    <div className="flex flex-wrap gap-2">
-                                      {event.participants.map((participant, index) => (
-                                        <span
-                                          key={index}
-                                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                                            participant.role === 'recipient' 
-                                              ? 'bg-green-100 text-green-800' 
-                                              : 'bg-blue-100 text-blue-800'
-                                          }`}
-                                        >
-                                          {participant.name} ({participant.role === 'recipient' ? 'Destinataire' : 'Expéditeur'})
-                    </span>
-              ))}
-                                    </div>
-          </div>
-
-                                  {/* Dates */}
-                                  <div className="mb-3 space-y-1">
-                                    <div className="flex items-center text-sm text-gray-600">
-                                      <span className="mr-2">📅</span>
-                                      <span className="font-medium">Date de l'événement :</span>
-                                      <span className="ml-2">{event.date} à {event.time}</span>
                       </div>
-                                    <div className="flex items-center text-sm text-gray-600">
-                                      <span className="mr-2">✏️</span>
-                                      <span className="font-medium">Créé le :</span>
-                                      <span className="ml-2">{new Date(event.createdAt).toLocaleDateString('fr-FR')}</span>
-                      </div>
-                                    <div className="flex items-center text-sm text-gray-600">
-                                      <span className="mr-2">👤</span>
-                                      <span className="font-medium">Créé par :</span>
-                                      <span className="ml-2">{event.createdBy}</span>
-                    </div>
-                  </div>
-
-                                  {/* Statut et priorité */}
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
-                                        {event.status === 'completed' ? '✓ Terminé' : 
-                                         event.status === 'pending' ? '⏸ En attente' : '✗ Annulé'}
-                                      </span>
-                                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                                        event.priority === 'high' ? 'bg-red-100 text-red-800' :
-                                        event.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-green-100 text-green-800'
-                                      }`}>
-                                        {event.priority === 'high' ? '🔴 Élevée' : 
-                                         event.priority === 'medium' ? '🟡 Moyenne' : '🟢 Faible'}
-                                      </span>
-                      </div>
-                                    <div className="flex space-x-1">
-                                      <button 
-                                        onClick={() => handleLinkModule('events', event.id)}
-                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium"
-                                        title="Lier"
-                                      >
-                                        Lier
-                                      </button>
-                                      <button 
-                                        onClick={() => handleUnlinkModule('events', event.id)}
-                                        className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-xs font-medium"
-                                        title="Délier"
-                                      >
-                                        Délier
-                                      </button>
-                                      <button 
-                                        onClick={() => handleModifyModule('event', event.id)}
-                                        className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs font-medium"
-                                        title="Modifier"
-                                      >
-                                        Modifier
-                                      </button>
-                                      <button 
-                                        onClick={() => handleDeleteModule('events', event.id, event.title)}
-                                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium"
-                                        title="Supprimer"
-                                      >
-                                        Supprimer
-                                      </button>
-                      </div>
-                      </div>
-                    </div>
                   </div>
                       </div>
                           ))}

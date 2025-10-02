@@ -981,10 +981,11 @@ export class SmartEventsService {
     return stored ? JSON.parse(stored) : [];
   }
 
-  // Forcer la régénération des événements (pour test)
+  // Forcer la régénération des événements (pour test) - DÉSACTIVÉ
   static forceRegenerate(): void {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem(this.STORAGE_KEY);
+    // Désactivé pour éviter de perdre les événements
+    // if (typeof window === 'undefined') return;
+    // localStorage.removeItem(this.STORAGE_KEY);
   }
 
   static getEventById(id: string): SmartEvent | null {

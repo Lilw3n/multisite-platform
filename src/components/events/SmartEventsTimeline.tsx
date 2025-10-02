@@ -600,22 +600,82 @@ export default function SmartEventsTimeline({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Logique pour lier l'événement
-                  console.log('Lier événement:', event.id);
+                  // Logique pour lier l'événement à l'interlocuteur
+                  if (interlocutorId) {
+                    try {
+                      const InterlocutorService = require('@/lib/interlocutors').InterlocutorService;
+                      const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
+                      
+                      if (interlocutor) {
+                        // Ajouter l'événement à l'interlocuteur s'il n'existe pas déjà
+                        const existingEvent = interlocutor.events?.find((e: any) => e.id === event.id);
+                        if (!existingEvent) {
+                          const legacyEvent = {
+                            id: event.id,
+                            title: event.title,
+                            description: event.description,
+                            type: event.classification.category,
+                            date: event.timestamps.scheduledAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+                            time: event.timestamps.scheduledAt?.split('T')[1]?.substring(0, 5) || '00:00',
+                            status: event.workflow.status === 'completed' ? 'completed' : 'pending',
+                            priority: event.classification.priority,
+                            participants: event.participants.recipients.map(r => ({ name: r.name, role: r.role })),
+                            createdAt: event.timestamps.createdAt,
+                            createdBy: event.participants.creator.name,
+                            attachments: event.attachments
+                          };
+                          
+                          const updatedInterlocutor = {
+                            ...interlocutor,
+                            events: [...(interlocutor.events || []), legacyEvent]
+                          };
+                          
+                          InterlocutorService.updateInterlocutor(updatedInterlocutor);
+                          alert('✅ Événement lié avec succès à l\'interlocuteur !');
+                          window.location.reload();
+                        } else {
+                          alert('ℹ️ Cet événement est déjà lié à cet interlocuteur.');
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Erreur liaison événement:', error);
+                      alert('❌ Erreur lors de la liaison de l\'événement.');
+                    }
+                  }
                 }}
                 className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
-                title="Lier à un autre événement"
+                title="Lier à l'interlocuteur"
               >
                 🔗 Lier
               </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Logique pour délier l'événement
-                  console.log('Délier événement:', event.id);
+                  // Logique pour délier l'événement de l'interlocuteur
+                  if (interlocutorId && confirm('Êtes-vous sûr de vouloir délier cet événement de l\'interlocuteur ?')) {
+                    try {
+                      const InterlocutorService = require('@/lib/interlocutors').InterlocutorService;
+                      const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
+                      
+                      if (interlocutor) {
+                        // Supprimer l'événement de l'interlocuteur
+                        const updatedInterlocutor = {
+                          ...interlocutor,
+                          events: (interlocutor.events || []).filter((e: any) => e.id !== event.id)
+                        };
+                        
+                        InterlocutorService.updateInterlocutor(updatedInterlocutor);
+                        alert('✅ Événement délié avec succès de l\'interlocuteur !');
+                        window.location.reload();
+                      }
+                    } catch (error) {
+                      console.error('Erreur déliaison événement:', error);
+                      alert('❌ Erreur lors de la déliaison de l\'événement.');
+                    }
+                  }
                 }}
                 className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors"
-                title="Délier l'événement"
+                title="Délier de l'interlocuteur"
               >
                 🔓 Délier
               </button>
@@ -634,12 +694,36 @@ export default function SmartEventsTimeline({
                 onClick={(e) => {
                   e.stopPropagation();
                   // Logique pour supprimer l'événement
-                  if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
-                    console.log('Supprimer événement:', event.id);
+                  if (confirm('Êtes-vous sûr de vouloir supprimer définitivement cet événement ?')) {
+                    try {
+                      // Supprimer de SmartEventsService
+                      SmartEventsService.deleteEvent(event.id);
+                      
+                      // Supprimer aussi de l'interlocuteur si lié
+                      if (interlocutorId) {
+                        const InterlocutorService = require('@/lib/interlocutors').InterlocutorService;
+                        const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
+                        
+                        if (interlocutor) {
+                          const updatedInterlocutor = {
+                            ...interlocutor,
+                            events: (interlocutor.events || []).filter((e: any) => e.id !== event.id)
+                          };
+                          
+                          InterlocutorService.updateInterlocutor(updatedInterlocutor);
+                        }
+                      }
+                      
+                      alert('✅ Événement supprimé avec succès !');
+                      window.location.reload();
+                    } catch (error) {
+                      console.error('Erreur suppression événement:', error);
+                      alert('❌ Erreur lors de la suppression de l\'événement.');
+                    }
                   }
                 }}
                 className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
-                title="Supprimer l'événement"
+                title="Supprimer définitivement"
               >
                 🗑️ Supprimer
               </button>

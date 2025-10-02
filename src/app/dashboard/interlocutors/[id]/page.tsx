@@ -62,6 +62,7 @@ export default function InterlocutorDetailPage() {
   const [eventDateFilter, setEventDateFilter] = useState<string>('all');
   const [eventSortBy, setEventSortBy] = useState<string>('event_date'); // 'event_date' ou 'creation_date'
   const [eventSortOrder, setEventSortOrder] = useState<string>('desc'); // 'asc' ou 'desc'
+  const [useAISearch, setUseAISearch] = useState(false); // Recherche IA activée
   
   // États pour les formulaires de modification
   const [showClaimEditForm, setShowClaimEditForm] = useState(false);
@@ -558,12 +559,13 @@ export default function InterlocutorDetailPage() {
 
     // D'abord filtrer
     const filtered = interlocutor.events.filter(event => {
-      // Filtre par recherche textuelle
+      // Filtre par recherche textuelle (IA ou classique)
       const matchesSearch = eventSearchQuery === '' || 
-        event.title.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
-        event.description.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
-        event.createdBy.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
-        event.participants.some(p => p.name.toLowerCase().includes(eventSearchQuery.toLowerCase()));
+        (useAISearch ? aiSearch(eventSearchQuery, event) : 
+         normalizeText(event.title).includes(normalizeText(eventSearchQuery)) ||
+         normalizeText(event.description).includes(normalizeText(eventSearchQuery)) ||
+         normalizeText(event.createdBy).includes(normalizeText(eventSearchQuery)) ||
+         event.participants.some(p => normalizeText(p.name).includes(normalizeText(eventSearchQuery))));
 
       // Filtre par type
       const matchesType = eventTypeFilter === 'all' || event.type === eventTypeFilter;
@@ -623,6 +625,96 @@ export default function InterlocutorDetailPage() {
       return eventSortOrder === 'asc' ? comparison : -comparison;
     });
   })();
+
+  // Fonction pour normaliser le texte (enlever accents, casse, etc.)
+  const normalizeText = (text: string): string => {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Enlever les accents
+      .replace(/[^\w\s]/g, ' ') // Remplacer ponctuation par espaces
+      .replace(/\s+/g, ' ') // Normaliser les espaces
+      .trim();
+  };
+
+  // Fonction de recherche IA avec synonymes et contexte
+  const aiSearch = (query: string, event: any): boolean => {
+    const normalizedQuery = normalizeText(query);
+    
+    // Si la recherche contient des guillemets, recherche exacte
+    if (query.includes('"')) {
+      const exactQuery = query.replace(/"/g, '').toLowerCase();
+      return event.title.toLowerCase().includes(exactQuery) ||
+             event.description.toLowerCase().includes(exactQuery) ||
+             event.createdBy.toLowerCase().includes(exactQuery);
+    }
+
+    // Dictionnaire de synonymes et contextes
+    const synonyms: { [key: string]: string[] } = {
+      'appel': ['telephone', 'tel', 'call', 'coup de fil', 'contact telephonique', 'conversation'],
+      'telephone': ['appel', 'tel', 'call', 'coup de fil', 'contact telephonique'],
+      'email': ['mail', 'courriel', 'message electronique', 'e-mail', 'courrier'],
+      'mail': ['email', 'courriel', 'message electronique', 'e-mail', 'courrier'],
+      'reunion': ['meeting', 'rendez-vous', 'rdv', 'entretien', 'rencontre', 'conference'],
+      'meeting': ['reunion', 'rendez-vous', 'rdv', 'entretien', 'rencontre'],
+      'rdv': ['rendez-vous', 'reunion', 'meeting', 'entretien', 'rencontre'],
+      'tache': ['task', 'travail', 'action', 'todo', 'a faire', 'mission'],
+      'task': ['tache', 'travail', 'action', 'todo', 'a faire', 'mission'],
+      'note': ['memo', 'remarque', 'commentaire', 'observation', 'annotation'],
+      'urgent': ['prioritaire', 'important', 'critique', 'presse', 'emergency'],
+      'important': ['urgent', 'prioritaire', 'critique', 'essentiel', 'majeur'],
+      'client': ['prospect', 'contact', 'interlocuteur', 'personne', 'individu'],
+      'prospect': ['client', 'contact', 'lead', 'potentiel', 'futur client'],
+      'assurance': ['police', 'contrat', 'couverture', 'protection', 'garantie'],
+      'sinistre': ['accident', 'dommage', 'incident', 'probleme', 'reclamation'],
+      'devis': ['estimation', 'proposition', 'offre', 'tarif', 'prix', 'cotation'],
+      'contrat': ['accord', 'convention', 'engagement', 'police', 'document'],
+      'paiement': ['reglement', 'versement', 'transaction', 'facture', 'somme'],
+      'facture': ['paiement', 'reglement', 'note', 'addition', 'montant']
+    };
+
+    // Contextes thématiques
+    const contexts: { [key: string]: string[] } = {
+      'assurance': ['police', 'prime', 'franchise', 'garantie', 'couverture', 'sinistre', 'indemnisation'],
+      'commercial': ['vente', 'prospect', 'client', 'devis', 'proposition', 'negociation', 'closing'],
+      'administratif': ['document', 'papier', 'formulaire', 'dossier', 'procedure', 'validation'],
+      'technique': ['probleme', 'bug', 'erreur', 'maintenance', 'reparation', 'support'],
+      'financier': ['paiement', 'facture', 'reglement', 'comptabilite', 'budget', 'cout']
+    };
+
+    // Recherche dans le contenu de l'événement
+    const eventContent = normalizeText(`${event.title} ${event.description} ${event.createdBy} ${event.participants?.map((p: any) => p.name).join(' ') || ''}`);
+    
+    // Recherche directe normalisée
+    if (eventContent.includes(normalizedQuery)) {
+      return true;
+    }
+
+    // Recherche par synonymes
+    const queryWords = normalizedQuery.split(' ');
+    for (const word of queryWords) {
+      if (synonyms[word]) {
+        for (const synonym of synonyms[word]) {
+          if (eventContent.includes(normalizeText(synonym))) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // Recherche contextuelle
+    for (const [context, keywords] of Object.entries(contexts)) {
+      if (normalizedQuery.includes(context)) {
+        for (const keyword of keywords) {
+          if (eventContent.includes(normalizeText(keyword))) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -1032,16 +1124,39 @@ export default function InterlocutorDetailPage() {
                           
                           {/* Barre de recherche et filtres */}
                           <div className="mb-4 space-y-3 bg-gray-50 p-3 rounded-lg border">
-                            {/* Recherche textuelle */}
-                            <div className="relative">
-                              <input
-                                type="text"
-                                placeholder="🔍 Rechercher dans les événements..."
-                                value={eventSearchQuery}
-                                onChange={(e) => setEventSearchQuery(e.target.value)}
-                                className="w-full pl-8 pr-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              />
-                              <span className="absolute left-2 top-2.5 text-gray-400">🔍</span>
+                            {/* Recherche textuelle avec toggle IA */}
+                            <div>
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  placeholder={useAISearch ? 
+                                    "🧠 Recherche IA: synonymes, contexte, \"guillemets pour exact\"..." : 
+                                    "🔍 Recherche classique (sans accents): titre, description, créateur..."}
+                                  value={eventSearchQuery}
+                                  onChange={(e) => setEventSearchQuery(e.target.value)}
+                                  className="w-full pl-8 pr-20 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <span className="absolute left-2 top-2.5 text-gray-400">
+                                  {useAISearch ? '🧠' : '🔍'}
+                                </span>
+                                <button
+                                  onClick={() => setUseAISearch(!useAISearch)}
+                                  className={`absolute right-2 top-1 px-2 py-1 text-xs rounded transition-colors ${
+                                    useAISearch 
+                                      ? 'bg-purple-100 text-purple-700 hover:bg-purple-200' 
+                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                  }`}
+                                  title={useAISearch ? 'Recherche IA activée (synonymes, contexte)' : 'Recherche classique (cliquez pour IA)'}
+                                >
+                                  {useAISearch ? '🧠 IA' : '🔍 Normal'}
+                                </button>
+                              </div>
+                              {useAISearch && (
+                                <div className="mt-2 text-xs text-purple-600 bg-purple-50 p-2 rounded">
+                                  💡 <strong>Recherche IA activée :</strong> Tapez "appel" pour trouver "téléphone", "réunion" pour "RDV", 
+                                  "assurance" pour "police/garantie", ou utilisez des "guillemets" pour une recherche exacte.
+                                </div>
+                              )}
                             </div>
                             
                             {/* Filtres */}
@@ -1127,7 +1242,7 @@ export default function InterlocutorDetailPage() {
                             </div>
                             
                             {/* Bouton reset filtres */}
-                            {(eventSearchQuery || eventTypeFilter !== 'all' || eventStatusFilter !== 'all' || eventPriorityFilter !== 'all' || eventDateFilter !== 'all' || eventSortBy !== 'event_date' || eventSortOrder !== 'desc') && (
+                            {(eventSearchQuery || eventTypeFilter !== 'all' || eventStatusFilter !== 'all' || eventPriorityFilter !== 'all' || eventDateFilter !== 'all' || eventSortBy !== 'event_date' || eventSortOrder !== 'desc' || useAISearch) && (
                               <div className="flex justify-end">
                                 <button
                                   onClick={() => {
@@ -1138,10 +1253,11 @@ export default function InterlocutorDetailPage() {
                                     setEventDateFilter('all');
                                     setEventSortBy('event_date');
                                     setEventSortOrder('desc');
+                                    setUseAISearch(false);
                                   }}
                                   className="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded transition-colors"
                                 >
-                                  🔄 Réinitialiser filtres et tri
+                                  🔄 Réinitialiser tout
                                 </button>
                               </div>
                             )}

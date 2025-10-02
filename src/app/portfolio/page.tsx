@@ -197,7 +197,7 @@ export default function PortfolioPage() {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-4">
-              Wendy <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">"Diddy"</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Diddy</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
@@ -206,12 +206,12 @@ export default function PortfolioPage() {
             
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                <MapPin className="w-4 h-4 text-purple-400" />
-                <span className="text-gray-300">15 Rue Pierre Curie, 54110 Varangéville</span>
+                <Mail className="w-4 h-4 text-purple-400" />
+                <span className="text-gray-300">contact@diddyhome.com</span>
               </div>
               <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                <Phone className="w-4 h-4 text-purple-400" />
-                <span className="text-gray-300">06 95 82 08 66</span>
+                <Globe className="w-4 h-4 text-purple-400" />
+                <span className="text-gray-300">France</span>
               </div>
             </div>
 
@@ -225,7 +225,7 @@ export default function PortfolioPage() {
                 <Linkedin className="w-6 h-6" />
               </a>
               <a 
-                href="mailto:contact@diddyhome.fr"
+                href="mailto:contact@diddyhome.com"
                 className="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full transition-colors"
               >
                 <Mail className="w-6 h-6" />
@@ -424,18 +424,23 @@ export default function PortfolioPage() {
                     N'hésitez pas à me contacter !
                   </p>
                   
-                  <div className="space-y-4">
+                    <div className="space-y-4">
                     <div className="flex items-center space-x-3">
                       <Mail className="w-5 h-5 text-purple-400" />
-                      <span className="text-gray-300">contact@diddyhome.fr</span>
+                      <a 
+                        href="mailto:contact@diddyhome.com"
+                        className="text-purple-300 hover:text-purple-200 transition-colors"
+                      >
+                        contact@diddyhome.com
+                      </a>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <Phone className="w-5 h-5 text-purple-400" />
-                      <span className="text-gray-300">06 95 82 08 66</span>
+                      <Globe className="w-5 h-5 text-purple-400" />
+                      <span className="text-gray-300">France</span>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <MapPin className="w-5 h-5 text-purple-400" />
-                      <span className="text-gray-300">15 Rue Pierre Curie, 54110 Varangéville</span>
+                      <MessageCircle className="w-5 h-5 text-purple-400" />
+                      <span className="text-gray-300">Contact via plateforme DiddyHome</span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <Linkedin className="w-5 h-5 text-purple-400" />

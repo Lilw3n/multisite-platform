@@ -6,6 +6,8 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { useAuth } from '@/contexts/MinimalAuthContext';
 import InterlocutorSelector from '@/components/InterlocutorSelector';
+import VehicleSelector from '@/components/VehicleSelector';
+import CompanySelector from '@/components/CompanySelector';
 import QuoteContractWizard from '@/components/QuoteContractWizard';
 import IntelligentQuoteWizard from '@/components/quotes/IntelligentQuoteWizard';
 
@@ -88,6 +90,8 @@ export default function QuotesPage() {
   const [showQuoteWizard, setShowQuoteWizard] = useState(false);
   const [showIntelligentWizard, setShowIntelligentWizard] = useState(false);
   const [selectedInterlocutor, setSelectedInterlocutor] = useState<any>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [selectedCompany, setSelectedCompany] = useState<any>(null);
 
   const getStatusColor = (status: Quote['status']) => {
     switch (status) {
@@ -477,6 +481,40 @@ export default function QuotesPage() {
                               placeholder="Rechercher un client existant ou créer un nouveau..."
                               required={true}
                               userRole={user?.role || 'admin'}
+                            />
+                          </div>
+
+                          {/* Sélecteur de véhicule */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Véhicule à assurer *
+                            </label>
+                            <VehicleSelector
+                              selectedVehicle={selectedVehicle}
+                              onSelect={setSelectedVehicle}
+                              onClear={() => setSelectedVehicle(null)}
+                              subscriberName={selectedInterlocutor?.contactPerson}
+                              subscriberSiret={selectedCompany?.siret}
+                              placeholder="Rechercher par plaque d'immatriculation..."
+                              required={true}
+                              showTechnicalDetails={false}
+                            />
+                          </div>
+
+                          {/* Sélecteur d'entreprise */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Entreprise (optionnel)
+                            </label>
+                            <CompanySelector
+                              selectedCompany={selectedCompany}
+                              onSelect={setSelectedCompany}
+                              onClear={() => setSelectedCompany(null)}
+                              subscriberName={selectedInterlocutor?.contactPerson}
+                              placeholder="Rechercher par SIRET ou nom d'entreprise..."
+                              required={false}
+                              showDetails={false}
+                              allowManualCreation={true}
                             />
                           </div>
                         </div>

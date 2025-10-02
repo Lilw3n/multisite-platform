@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { IntelligentQuoteService } from '@/lib/intelligentQuoteService';
 import InterlocutorSelector from '@/components/InterlocutorSelector';
+import VehicleSelector from '@/components/VehicleSelector';
+import CompanySelector from '@/components/CompanySelector';
 import { 
   IntelligentQuoteSession, 
   QuestionnaireStep, 
@@ -52,6 +54,8 @@ export default function IntelligentQuoteWizard({
   const [eligibilityScore, setEligibilityScore] = useState<number>(0);
   const [showAIInsights, setShowAIInsights] = useState(false);
   const [selectedInterlocutor, setSelectedInterlocutor] = useState<any>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [selectedCompany, setSelectedCompany] = useState<any>(null);
 
   useEffect(() => {
     initializeSession();
@@ -633,6 +637,92 @@ export default function IntelligentQuoteWizard({
                 {errors['interlocutor'] && (
                   <p className="text-sm text-red-600">{errors['interlocutor']}</p>
                 )}
+              </div>
+            )}
+
+            {/* Sélection de véhicule pour les étapes véhicule */}
+            {(currentStep.id === 'vehicle_info' || currentStep.id === 'auto_specific') && (
+              <div className="space-y-2 mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Véhicule à assurer *
+                </label>
+                <VehicleSelector
+                  selectedVehicle={selectedVehicle}
+                  onSelect={(vehicle) => {
+                    setSelectedVehicle(vehicle);
+                    // Pré-remplir les champs avec les données du véhicule
+                    const newAnswers = {
+                      ...answers,
+                      vehicle_brand: vehicle.brand,
+                      vehicle_model: vehicle.model,
+                      vehicle_registration: vehicle.registration,
+                      vehicle_power: vehicle.enginePower,
+                      vehicle_fuel: vehicle.fuelType,
+                      first_registration: vehicle.firstRegistrationDate,
+                      vehicle_value: vehicle.currentArgusValue
+                    };
+                    setAnswers(newAnswers);
+                  }}
+                  onClear={() => {
+                    setSelectedVehicle(null);
+                    // Vider les champs pré-remplis
+                    const newAnswers = { ...answers };
+                    delete newAnswers.vehicle_brand;
+                    delete newAnswers.vehicle_model;
+                    delete newAnswers.vehicle_registration;
+                    delete newAnswers.vehicle_power;
+                    delete newAnswers.vehicle_fuel;
+                    delete newAnswers.first_registration;
+                    delete newAnswers.vehicle_value;
+                    setAnswers(newAnswers);
+                  }}
+                  subscriberName={selectedInterlocutor?.contactPerson || answers.first_name + ' ' + answers.last_name}
+                  subscriberSiret={selectedCompany?.siret}
+                  placeholder="Rechercher par plaque d'immatriculation..."
+                  required={true}
+                  showTechnicalDetails={true}
+                />
+              </div>
+            )}
+
+            {/* Sélection d'entreprise pour les étapes entreprise */}
+            {(currentStep.id === 'company_info' || currentStep.id === 'professional_info') && (
+              <div className="space-y-2 mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Entreprise (optionnel pour particuliers)
+                </label>
+                <CompanySelector
+                  selectedCompany={selectedCompany}
+                  onSelect={(company) => {
+                    setSelectedCompany(company);
+                    // Pré-remplir les champs avec les données de l'entreprise
+                    const newAnswers = {
+                      ...answers,
+                      company_name: company.legalName,
+                      company_siret: company.siret,
+                      company_activity: company.mainActivity,
+                      company_address: `${company.address.street}, ${company.address.postalCode} ${company.address.city}`,
+                      legal_form: company.legalForm
+                    };
+                    setAnswers(newAnswers);
+                  }}
+                  onClear={() => {
+                    setSelectedCompany(null);
+                    // Vider les champs pré-remplis
+                    const newAnswers = { ...answers };
+                    delete newAnswers.company_name;
+                    delete newAnswers.company_siret;
+                    delete newAnswers.company_activity;
+                    delete newAnswers.company_address;
+                    delete newAnswers.legal_form;
+                    setAnswers(newAnswers);
+                  }}
+                  subscriberName={selectedInterlocutor?.contactPerson || answers.first_name + ' ' + answers.last_name}
+                  placeholder="Rechercher par SIRET, SIREN ou nom d'entreprise..."
+                  required={false}
+                  showDetails={true}
+                  allowManualCreation={true}
+                />
               </div>
             )}
             

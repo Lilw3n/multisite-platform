@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Check, AlertTriangle, User, Car, Shield, CreditCard, FileText, Bot } from 'lucide-react';
 import InterlocutorSelector from './InterlocutorSelector';
+import VehicleSelector from './VehicleSelector';
+import CompanySelector from './CompanySelector';
 import { EligibilityService } from '@/lib/eligibilityService';
 
 interface WizardProps {
@@ -308,6 +310,25 @@ export default function QuoteContractWizard({ type, onComplete, onCancel, userRo
               onClear={() => setWizardData(prev => ({ ...prev, interlocutor: null }))}
               userRole={userRole}
             />
+
+            {/* Sélecteur d'entreprise si professionnel */}
+            {wizardData.interlocutor?.type === 'client' && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Entreprise (optionnel pour particuliers)
+                </label>
+                <CompanySelector
+                  selectedCompany={wizardData.company}
+                  onSelect={(company) => setWizardData(prev => ({ ...prev, company }))}
+                  onClear={() => setWizardData(prev => ({ ...prev, company: null }))}
+                  subscriberName={wizardData.interlocutor?.contactPerson}
+                  placeholder="Rechercher par SIRET, SIREN ou nom d'entreprise..."
+                  required={false}
+                  showDetails={true}
+                  allowManualCreation={true}
+                />
+              </div>
+            )}
           </div>
         );
 
@@ -316,12 +337,23 @@ export default function QuoteContractWizard({ type, onComplete, onCancel, userRo
           <div className="space-y-6">
             <div className="text-center">
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Informations du véhicule
+                Sélection du véhicule
               </h3>
               <p className="text-gray-600">
-                Renseignez les détails du véhicule à assurer
+                Recherchez le véhicule par plaque d'immatriculation ou créez-en un nouveau
               </p>
             </div>
+
+            <VehicleSelector
+              selectedVehicle={wizardData.vehicle}
+              onSelect={(vehicle) => setWizardData(prev => ({ ...prev, vehicle }))}
+              onClear={() => setWizardData(prev => ({ ...prev, vehicle: null }))}
+              subscriberName={wizardData.interlocutor?.contactPerson}
+              subscriberSiret={wizardData.interlocutor?.company}
+              placeholder="Rechercher par plaque d'immatriculation..."
+              required={true}
+              showTechnicalDetails={true}
+            />
 
             {/* Suggestion de réutilisation */}
             {existingData?.vehicles?.length > 0 && !wizardData.vehicle && (

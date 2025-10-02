@@ -7,6 +7,7 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { useAuth } from '@/contexts/MinimalAuthContext';
 import InterlocutorSelector from '@/components/InterlocutorSelector';
 import QuoteContractWizard from '@/components/QuoteContractWizard';
+import IntelligentQuoteWizard from '@/components/quotes/IntelligentQuoteWizard';
 
 // Types pour les devis
 interface Quote {
@@ -85,6 +86,7 @@ export default function QuotesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showNewQuoteForm, setShowNewQuoteForm] = useState(false);
   const [showQuoteWizard, setShowQuoteWizard] = useState(false);
+  const [showIntelligentWizard, setShowIntelligentWizard] = useState(false);
   const [selectedInterlocutor, setSelectedInterlocutor] = useState<any>(null);
 
   const getStatusColor = (status: Quote['status']) => {
@@ -141,6 +143,10 @@ export default function QuotesPage() {
   };
 
   const handleNewQuote = () => {
+    setShowIntelligentWizard(true);
+  };
+
+  const handleNewQuoteClassic = () => {
     setShowQuoteWizard(true);
   };
 
@@ -174,6 +180,16 @@ export default function QuotesPage() {
 
   const handleWizardCancel = () => {
     setShowQuoteWizard(false);
+  };
+
+  const handleIntelligentWizardComplete = (session: any) => {
+    console.log('Devis intelligent créé:', session);
+    alert('Devis intelligent créé avec succès !');
+    setShowIntelligentWizard(false);
+  };
+
+  const handleIntelligentWizardCancel = () => {
+    setShowIntelligentWizard(false);
   };
 
   if (!user) {
@@ -238,9 +254,16 @@ export default function QuotesPage() {
                   <div className="flex items-end space-x-2">
                     <button 
                       onClick={handleNewQuote}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2"
                     >
-                      🧙‍♂️ Assistant devis
+                      <span>🧠</span>
+                      <span>Assistant IA</span>
+                    </button>
+                    <button 
+                      onClick={handleNewQuoteClassic}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    >
+                      🧙‍♂️ Assistant classique
                     </button>
                     <button 
                       onClick={handleNewQuoteSimple}
@@ -520,7 +543,19 @@ export default function QuotesPage() {
                 </div>
               )}
 
-              {/* Assistant de création de devis */}
+              {/* Assistant intelligent de création de devis */}
+              {showIntelligentWizard && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[95vh] overflow-y-auto">
+                    <IntelligentQuoteWizard
+                      onComplete={handleIntelligentWizardComplete}
+                      onCancel={handleIntelligentWizardCancel}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Assistant classique de création de devis */}
               {showQuoteWizard && (
                 <QuoteContractWizard
                   type="quote"

@@ -1000,9 +1000,106 @@ export default function InterlocutorDetailPage() {
                       <div className="p-2 max-h-[70vh] overflow-y-auto">
                         {/* Affichage classique des événements - SYSTÈME ORIGINAL */}
                         <div className="mb-4">
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">📝 Événements Classiques</h4>
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-medium text-gray-700">📝 Événements Classiques</h4>
+                            <span className="text-xs text-gray-500">({filteredEvents.length} événements)</span>
+                          </div>
+                          
+                          {/* Barre de recherche et filtres */}
+                          <div className="mb-4 space-y-3 bg-gray-50 p-3 rounded-lg border">
+                            {/* Recherche textuelle */}
+                            <div className="relative">
+                              <input
+                                type="text"
+                                placeholder="🔍 Rechercher dans les événements..."
+                                value={eventSearchQuery}
+                                onChange={(e) => setEventSearchQuery(e.target.value)}
+                                className="w-full pl-8 pr-4 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                              <span className="absolute left-2 top-2.5 text-gray-400">🔍</span>
+                            </div>
+                            
+                            {/* Filtres */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              {/* Filtre par type */}
+                              <select
+                                value={eventTypeFilter}
+                                onChange={(e) => setEventTypeFilter(e.target.value)}
+                                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500"
+                              >
+                                <option value="all">📋 Tous types</option>
+                                <option value="call">📞 Appels</option>
+                                <option value="email">📧 Emails</option>
+                                <option value="meeting">🤝 Réunions</option>
+                                <option value="task">✅ Tâches</option>
+                                <option value="note">📝 Notes</option>
+                              </select>
+                              
+                              {/* Filtre par statut */}
+                              <select
+                                value={eventStatusFilter}
+                                onChange={(e) => setEventStatusFilter(e.target.value)}
+                                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500"
+                              >
+                                <option value="all">📊 Tous statuts</option>
+                                <option value="pending">⏸ En attente</option>
+                                <option value="completed">✓ Terminé</option>
+                                <option value="cancelled">✗ Annulé</option>
+                              </select>
+                              
+                              {/* Filtre par priorité */}
+                              <select
+                                value={eventPriorityFilter}
+                                onChange={(e) => setEventPriorityFilter(e.target.value)}
+                                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500"
+                              >
+                                <option value="all">🎯 Toutes priorités</option>
+                                <option value="high">🔴 Élevée</option>
+                                <option value="medium">🟡 Moyenne</option>
+                                <option value="low">🟢 Faible</option>
+                              </select>
+                              
+                              {/* Filtre par date */}
+                              <select
+                                value={eventDateFilter}
+                                onChange={(e) => setEventDateFilter(e.target.value)}
+                                className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500"
+                              >
+                                <option value="all">📅 Toutes dates</option>
+                                <option value="today">📅 Aujourd'hui</option>
+                                <option value="yesterday">📅 Hier</option>
+                                <option value="week">📅 Cette semaine</option>
+                                <option value="month">📅 Ce mois</option>
+                              </select>
+                            </div>
+                            
+                            {/* Bouton reset filtres */}
+                            {(eventSearchQuery || eventTypeFilter !== 'all' || eventStatusFilter !== 'all' || eventPriorityFilter !== 'all' || eventDateFilter !== 'all') && (
+                              <div className="flex justify-end">
+                                <button
+                                  onClick={() => {
+                                    setEventSearchQuery('');
+                                    setEventTypeFilter('all');
+                                    setEventStatusFilter('all');
+                                    setEventPriorityFilter('all');
+                                    setEventDateFilter('all');
+                                  }}
+                                  className="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded transition-colors"
+                                >
+                                  🔄 Réinitialiser filtres
+                                </button>
+                              </div>
+                            )}
+                          </div>
                           <div className="space-y-2">
-                            {interlocutor.events.map((event) => (
+                            {filteredEvents.length === 0 ? (
+                              <div className="text-center py-8 text-gray-500">
+                                <div className="text-4xl mb-2">🔍</div>
+                                <p className="text-sm">Aucun événement ne correspond aux filtres</p>
+                                <p className="text-xs mt-1">Essayez de modifier vos critères de recherche</p>
+                              </div>
+                            ) : (
+                              filteredEvents.map((event) => (
                               <div key={event.id} className="border border-gray-200 rounded-lg p-2 hover:shadow-md transition-shadow bg-gradient-to-r from-gray-50 to-white">
                                 <div className="flex items-start space-x-2">
                                   <span className="text-lg flex-shrink-0">
@@ -1103,7 +1200,8 @@ export default function InterlocutorDetailPage() {
                                   </div>
                                 </div>
                               </div>
-                            ))}
+                              ))
+                            )}
                           </div>
                         </div>
 

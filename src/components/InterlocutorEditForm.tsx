@@ -30,18 +30,26 @@ export default function InterlocutorEditForm({ interlocutor, onSuccess, onCancel
 
     if (!formData.firstName.trim()) newErrors.firstName = 'Le prénom est requis';
     if (!formData.lastName.trim()) newErrors.lastName = 'Le nom est requis';
-    if (!formData.email.trim()) newErrors.email = 'L\'email est requis';
-    if (!formData.phone.trim()) newErrors.phone = 'Le téléphone est requis';
-
-    // Validation email
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    
+    // Validation conditionnelle des champs de contact
+    const hasEmail = formData.email && formData.email.trim() !== '';
+    const hasPhone = formData.phone && formData.phone.trim() !== '';
+    
+    // Logique de priorité : Email > Téléphone > Aucun (facultatif)
+    // Pour l'édition, on est plus permissif mais on valide les formats si fournis
+    
+    // Validation email si fourni
+    if (hasEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Format d\'email invalide';
     }
 
-    // Validation téléphone français
-    if (formData.phone && !/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/.test(formData.phone.replace(/\s/g, ''))) {
+    // Validation téléphone français si fourni
+    if (hasPhone && !/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/.test(formData.phone.replace(/\s/g, ''))) {
       newErrors.phone = 'Format de téléphone invalide';
     }
+
+    // Note: Pour l'édition, on ne force pas la présence d'email ou téléphone
+    // car l'interlocuteur existe déjà
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

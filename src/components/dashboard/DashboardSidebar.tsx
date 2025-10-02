@@ -32,7 +32,9 @@ import {
   MessageCircle,
   Video,
   ShoppingBag,
-  Zap
+  Zap,
+  FolderPlus,
+  Package
 } from 'lucide-react';
 
 interface MenuItem {
@@ -90,6 +92,17 @@ const menuItems: MenuItem[] = [
     ]
   },
   {
+    id: 'projects',
+    label: 'Projets',
+    icon: FolderPlus,
+    children: [
+      { id: 'projects-list', label: 'Tous les projets', icon: FolderPlus, href: '/dashboard/projects' },
+      { id: 'projects-create', label: 'Nouveau projet', icon: Plus, href: '/dashboard/projects/new' },
+      { id: 'projects-migrate', label: 'Migration', icon: Package, href: '/dashboard/projects/migrate' },
+      { id: 'projects-templates', label: 'Modèles', icon: FileText, href: '/dashboard/projects/templates' }
+    ]
+  },
+  {
     id: 'portfolio',
     label: 'Portefeuille',
     icon: FileText,
@@ -124,6 +137,12 @@ const menuItems: MenuItem[] = [
     label: 'Calendrier',
     icon: Calendar,
     href: '/dashboard/calendar'
+  },
+  {
+    id: 'events',
+    label: 'Événements',
+    icon: Clock,
+    href: '/dashboard/events'
   },
   {
     id: 'insurance',
@@ -162,7 +181,7 @@ const menuItems: MenuItem[] = [
     label: 'Hub Social',
     icon: Globe,
     children: [
-      { id: 'social-main', label: 'Hub Principal', icon: Zap, href: '/external/social/hub' },
+      { id: 'social-main', label: 'Hub Principal', icon: Zap, href: '/external/social/hub' }, 
       { id: 'social-communities', label: 'Communautés', icon: MessageCircle, href: '/external/social' },
       { id: 'social-pro', label: 'Communauté Pro', icon: Car, href: '/external/social/hub/groups/VTC-Taxi' },
       { id: 'social-live', label: 'Live Streaming', icon: Video, href: '/external/social/hub#live' },

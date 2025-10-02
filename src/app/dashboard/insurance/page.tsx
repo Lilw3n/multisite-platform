@@ -3,11 +3,26 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { InterlocutorService } from '@/lib/interlocutors';
+import { Interlocutor } from '@/types/interlocutor';
+import { formatDateFR, parseFrenchDate } from '@/lib/dateUtils';
 
 export default function InsurancePage() {
   const [user, setUser] = useState<{ email: string; name: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeModule, setActiveModule] = useState('insurance');
+  const [interlocutors, setInterlocutors] = useState<Interlocutor[]>([]);
+  const [insuranceStats, setInsuranceStats] = useState({
+    totalVehicles: 0,
+    activePolicies: 0,
+    pendingClaims: 0,
+    totalCoverage: 0,
+    monthlyPremium: 0,
+    claimsThisMonth: 0,
+    activeDrivers: 0,
+    validLicenses: 0,
+    expiringThisMonth: 0
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -18,12 +33,67 @@ export default function InsurancePage() {
 
       if (token && email && name) {
         setUser({ email, name });
-        setIsLoading(false);
+        loadInsuranceData();
       } else {
         router.push('/login');
       }
     }
   }, [router]);
+
+  const loadInsuranceData = async () => {
+    try {
+      const data = await InterlocutorService.getAllInterlocutors();
+      setInterlocutors(data);
+      
+      // Calculer les statistiques réelles
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      
+      const stats = {
+        totalVehicles: data.reduce((sum, interlocutor) => sum + interlocutor.vehicles.length, 0),
+        activePolicies: data.reduce((sum, interlocutor) => 
+          sum + interlocutor.contracts.filter(c => c.status === 'En cours').length, 0),
+        pendingClaims: data.reduce((sum, interlocutor) => 
+          sum + interlocutor.claims.filter(c => c.status === 'En cours').length, 0),
+        totalCoverage: data.reduce((sum, interlocutor) => 
+          sum + interlocutor.contracts.reduce((contractSum, contract) => contractSum + (contract.premium || 0), 0), 0) * 12,
+        monthlyPremium: data.reduce((sum, interlocutor) => 
+          sum + interlocutor.contracts.reduce((contractSum, contract) => contractSum + (contract.premium || 0), 0), 0),
+        claimsThisMonth: data.reduce((sum, interlocutor) => {
+          const thisMonthClaims = interlocutor.claims.filter(claim => {
+            const claimDate = new Date(claim.createdAt);
+            return claimDate.getMonth() === currentMonth && claimDate.getFullYear() === currentYear;
+          });
+          return sum + thisMonthClaims.length;
+        }, 0),
+        activeDrivers: data.reduce((sum, interlocutor) => sum + interlocutor.drivers.length, 0),
+        validLicenses: data.reduce((sum, interlocutor) => {
+          const validDrivers = interlocutor.drivers.filter(driver => {
+            // Considérer comme valide si la date de permis existe et n'est pas trop ancienne
+            return driver.licenseDate && new Date(driver.licenseDate) < new Date();
+          });
+          return sum + validDrivers.length;
+        }, 0),
+        expiringThisMonth: data.reduce((sum, interlocutor) => {
+          const expiringContracts = interlocutor.contracts.filter(contract => {
+            // Convertir la date française en Date object
+            const endDateISO = parseFrenchDate(contract.endDate);
+            if (!endDateISO) return false;
+            
+            const endDate = new Date(endDateISO);
+            return endDate.getMonth() === currentMonth && endDate.getFullYear() === currentYear;
+          });
+          return sum + expiringContracts.length;
+        }, 0)
+      };
+      
+      setInsuranceStats(stats);
+    } catch (error) {
+      console.error('Erreur lors du chargement des données d\'assurance:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
@@ -51,15 +121,6 @@ export default function InsurancePage() {
     { id: 'periods', name: 'Périodes', icon: '📅', href: '/dashboard/insurance/periods' },
     { id: 'settings', name: 'Paramètres', icon: '⚙️', href: '/dashboard/settings' },
   ];
-
-  const insuranceStats = {
-    totalVehicles: 12,
-    activePolicies: 8,
-    pendingClaims: 2,
-    totalCoverage: 2500000,
-    monthlyPremium: 15000,
-    claimsThisMonth: 1
-  };
 
   if (isLoading) {
     return (
@@ -291,11 +352,11 @@ export default function InsurancePage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Conducteurs actifs:</span>
-                  <span className="font-medium">4</span>
+                  <span className="font-medium">{insuranceStats.activeDrivers}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Permis valides:</span>
-                  <span className="font-medium text-green-600">3</span>
+                  <span className="font-medium text-green-600">{insuranceStats.validLicenses}</span>
                 </div>
               </div>
             </Link>
@@ -339,7 +400,7 @@ export default function InsurancePage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Échéances ce mois:</span>
-                  <span className="font-medium text-orange-600">2</span>
+                  <span className="font-medium text-orange-600">{insuranceStats.expiringThisMonth}</span>
                 </div>
               </div>
             </Link>

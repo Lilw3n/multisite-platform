@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Event } from '@/types/interlocutor';
 import { InterlocutorService } from '@/lib/interlocutors';
 import { useAuth } from '@/contexts/MinimalAuthContext';
+import { getCurrentDateForInput, getCurrentTimeRoundedUp } from '@/lib/dateUtils';
 
 interface EventFormProps {
   interlocutorId: string;
@@ -18,8 +19,8 @@ export default function EventForm({ interlocutorId, onSuccess, onCancel, existin
     type: 'call',
     title: '',
     description: '',
-    date: '',
-    time: '',
+    date: getCurrentDateForInput(), // Date actuelle par défaut
+    time: getCurrentTimeRoundedUp(), // Heure actuelle arrondie au quart d'heure supérieur
     participants: [{ name: '', role: 'recipient' }],
     attachments: [{ name: '', type: 'document', url: '' }],
     urls: [{ title: '', url: '', type: 'link' }],

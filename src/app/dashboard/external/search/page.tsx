@@ -21,12 +21,7 @@ export default function InterlocutorSearchPage() {
         email: 'jean.dupont@company.com',
         phone: '01 23 45 67 89',
         company: 'Transport Dupont SARL',
-        address: {
-          street: '123 Rue de la Paix',
-          city: 'Paris',
-          postalCode: '75001',
-          country: 'France'
-        },
+        address: '123 Rue de la Paix, 75001 Paris, France',
         status: 'Actif',
         role: 'client',
         createdAt: '2024-01-15',
@@ -80,6 +75,9 @@ export default function InterlocutorSearchPage() {
         claims: [],
         vehicles: [],
         drivers: [],
+        events: [],
+        familyMembers: [],
+        companyRelations: [],
         externalInfo: {
           source: 'website',
           notes: 'Prospect intéressé par nos services',
@@ -121,7 +119,11 @@ export default function InterlocutorSearchPage() {
       <ExternalUserLayout
         title="Fiche Interlocuteur"
         subtitle={`Informations de ${selectedInterlocutor.firstName} ${selectedInterlocutor.lastName}`}
-        selectedInterlocutor={selectedInterlocutor}
+        selectedInterlocutor={{
+          id: selectedInterlocutor.id,
+          name: `${selectedInterlocutor.firstName} ${selectedInterlocutor.lastName}`,
+          email: selectedInterlocutor.email
+        }}
       >
         <div className="space-y-6">
           {/* Informations personnelles */}

@@ -827,7 +827,7 @@ export default function ContractsPage() {
                               onClear={() => setSelectedInterlocutor(null)}
                               placeholder="Rechercher un client existant ou créer un nouveau..."
                               required={true}
-                              userRole={user?.role || 'admin'}
+                              userRole={'admin'}
                             />
                           </div>
                         </div>

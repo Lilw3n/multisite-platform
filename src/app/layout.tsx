@@ -6,6 +6,7 @@ import { HydrationBoundary } from '@/components/ui/HydrationBoundary';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import SocialNavigationWrapper from '@/components/navigation/SocialNavigationWrapper';
 import MobileLayout from '@/components/mobile/MobileLayout';
+import CreatorPortfolioWidget from '@/components/ui/CreatorPortfolioWidget';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
                 {children}
               </SocialNavigationWrapper>
             </MobileLayout>
+            <CreatorPortfolioWidget />
           </AuthProvider>
         </HydrationBoundary>
       </body>

@@ -2,19 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, User, Building } from 'lucide-react';
-import { InterlocutorService } from '@/lib/interlocutorService';
+import { InterlocutorService } from '@/lib/interlocutors';
+import { Interlocutor } from '@/types/interlocutor';
 import InterlocutorForm from './InterlocutorForm';
-
-interface Interlocutor {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  contactPerson: string;
-  status: 'active' | 'inactive';
-  type: 'client' | 'prospect' | 'partenaire' | 'fournisseur';
-}
 
 interface InterlocutorSelectorProps {
   selectedInterlocutor?: Interlocutor | null;
@@ -65,7 +55,7 @@ export default function InterlocutorSelector({
     setIsLoading(true);
     try {
       const data = await InterlocutorService.getAllInterlocutors();
-      setInterlocutors(data.filter(i => i.status === 'active'));
+      setInterlocutors(data.filter(i => i.status === 'Actif'));
     } catch (error) {
       console.error('Erreur lors du chargement des interlocuteurs:', error);
     } finally {

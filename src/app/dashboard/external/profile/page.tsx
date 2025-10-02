@@ -43,9 +43,9 @@ export default function ExternalProfilePage() {
         // Rechercher l'interlocuteur par email
         const result = await InterlocutorService.searchInterlocutors(userEmail);
         
-        if (result.success && result.interlocutors && result.interlocutors.length > 0) {
+        if (result && result.length > 0) {
           // Prendre le premier interlocuteur correspondant
-          setInterlocutor(result.interlocutors[0]);
+          setInterlocutor(result[0]);
         } else {
           setError('Profil utilisateur non trouvé');
         }
@@ -62,7 +62,7 @@ export default function ExternalProfilePage() {
 
   if (isLoading) {
     return (
-      <Layout>
+      <Layout title="Profil Utilisateur">
         <div className="flex items-center justify-center min-h-96">
           <div className="text-center">
             <LoadingSpinner />
@@ -75,7 +75,7 @@ export default function ExternalProfilePage() {
 
   if (error || !interlocutor) {
     return (
-      <Layout>
+      <Layout title="Profil Utilisateur">
         <div className="max-w-4xl mx-auto p-6">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
@@ -115,7 +115,7 @@ export default function ExternalProfilePage() {
   };
 
   return (
-    <Layout>
+    <Layout title="Profil Utilisateur">
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         
         {/* En-tête du profil */}
@@ -256,18 +256,17 @@ export default function ExternalProfilePage() {
                     <div key={index} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
-                          <h3 className="font-semibold">{vehicle.make} {vehicle.model}</h3>
-                          <p className="text-sm text-gray-600">{vehicle.year} • {vehicle.licensePlate}</p>
+                          <h3 className="font-semibold">{vehicle.brand} {vehicle.model}</h3>
+                          <p className="text-sm text-gray-600">{vehicle.year} • {vehicle.registration}</p>
                         </div>
                         <span className={`px-2 py-1 rounded text-sm ${
-                          vehicle.status === 'Actif' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          vehicle.status === 'Assuré' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
                           {vehicle.status}
                         </span>
                       </div>
                       <div className="text-sm text-gray-600">
                         <span>Type : {vehicle.type}</span>
-                        {vehicle.vin && <span className="ml-4">VIN : {vehicle.vin}</span>}
                       </div>
                     </div>
                   ))}

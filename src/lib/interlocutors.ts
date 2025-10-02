@@ -239,35 +239,53 @@ export class InterlocutorService {
     userRole: 'admin' | 'internal' | 'external'
   ): Promise<{ success: boolean; interlocutor?: Interlocutor; error?: string }> {
     
-    // Vérifications pour les utilisateurs externes
+    // Validation conditionnelle des champs email et téléphone
+    const hasEmail = interlocutorData.email && interlocutorData.email.trim() !== '';
+    const hasPhone = interlocutorData.phone && interlocutorData.phone.trim() !== '';
+    
+    // Logique de priorité : Email > Téléphone > Aucun (facultatif)
+    if (hasEmail || hasPhone) {
+      // Si on a au moins un des deux, on doit valider l'unicité
+      
+      if (hasEmail) {
+        // Email prioritaire : vérifier l'unicité de l'email
+        const existingByEmail = interlocutors.find(i => i.email === interlocutorData.email);
+        if (existingByEmail) {
+          return {
+            success: false,
+            error: `Un interlocuteur avec l'email ${interlocutorData.email} existe déjà.`
+          };
+        }
+      } else if (hasPhone) {
+        // Pas d'email mais téléphone : vérifier l'unicité du téléphone
+        const existingByPhone = interlocutors.find(i => i.phone === interlocutorData.phone);
+        if (existingByPhone) {
+          return {
+            success: false,
+            error: `Un interlocuteur avec le téléphone ${interlocutorData.phone} existe déjà.`
+          };
+        }
+      }
+    }
+    // Si ni email ni téléphone, c'est autorisé (facultatif)
+    
+    // Vérifications spécifiques pour les utilisateurs externes
     if (userRole === 'external') {
-      // Vérifier si l'email ou le téléphone existe déjà
-      const existingByEmail = interlocutors.find(i => i.email === interlocutorData.email);
-      const existingByPhone = interlocutors.find(i => i.phone === interlocutorData.phone);
-      
-      if (existingByEmail) {
-        return {
-          success: false,
-          error: `Un interlocuteur avec l'email ${interlocutorData.email} existe déjà.`
-        };
-      }
-      
-      if (existingByPhone) {
-        return {
-          success: false,
-          error: `Un interlocuteur avec le téléphone ${interlocutorData.phone} existe déjà.`
-        };
-      }
-
       // Vérifier si l'utilisateur externe a déjà créé un interlocuteur
-      const userEmail = interlocutorData.email;
-      const userPhone = interlocutorData.phone;
-      const hasCreatedBefore = externalCreations.has(userEmail) || externalCreations.has(userPhone);
+      const userIdentifier = hasEmail ? interlocutorData.email : (hasPhone ? interlocutorData.phone : null);
       
-      if (hasCreatedBefore) {
+      if (userIdentifier && externalCreations.has(userIdentifier)) {
         return {
           success: false,
           error: 'En mode externe, vous ne pouvez créer qu\'un seul interlocuteur.'
+        };
+      }
+      
+      // Pour les externes, on exige au moins un moyen de contact
+      if (!hasEmail && !hasPhone) {
+        return {
+          success: false,
+          error: 'En mode externe, vous devez fournir au moins un email ou un téléphone.'
         };
       }
     }
@@ -290,8 +308,10 @@ export class InterlocutorService {
 
     // Enregistrer la création pour les utilisateurs externes
     if (userRole === 'external') {
-      externalCreations.set(interlocutorData.email, 1);
-      externalCreations.set(interlocutorData.phone, 1);
+      const userIdentifier = hasEmail ? interlocutorData.email : (hasPhone ? interlocutorData.phone : null);
+      if (userIdentifier) {
+        externalCreations.set(userIdentifier, 1);
+      }
     }
 
     return {

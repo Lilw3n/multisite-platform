@@ -12,8 +12,9 @@ export default function InterlocutorsPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    // Charger les interlocuteurs depuis le service
-    const loadedInterlocutors = InterlocutorService.getAllInterlocutors();
+    const loadInterlocutors = async () => {
+      // Charger les interlocuteurs depuis le service
+      const loadedInterlocutors = await InterlocutorService.getAllInterlocutors();
     
     // Si aucun interlocuteur, utiliser des données mock
     const mockInterlocutors: Interlocutor[] = loadedInterlocutors.length > 0 ? loadedInterlocutors : [
@@ -259,7 +260,10 @@ export default function InterlocutorsPage() {
       }
     ];
 
-    setInterlocutors(loadedInterlocutors.length > 0 ? loadedInterlocutors : mockInterlocutors);
+      setInterlocutors(loadedInterlocutors.length > 0 ? loadedInterlocutors : mockInterlocutors);
+    };
+    
+    loadInterlocutors();
   }, []);
 
   const filteredInterlocutors = interlocutors.filter(interlocutor => {

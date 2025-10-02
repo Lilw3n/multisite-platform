@@ -116,7 +116,7 @@ export default function AISuggestionsPage() {
   };
 
   const getDocumentTypeLabel = (type: string) => {
-    const types = {
+    const types: Record<string, string> = {
       bank_details: 'Coordonnées bancaires',
       vehicle_info: 'Informations véhicule',
       driver_info: 'Informations conducteur',

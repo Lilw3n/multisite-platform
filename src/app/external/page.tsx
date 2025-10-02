@@ -594,21 +594,31 @@ export default function ExternalHomePage() {
             </div>
             
             <div>
-              <h4 className="font-semibold text-white mb-4">À Propos</h4>
+              <h4 className="font-semibold text-white mb-4">Légal & Contact</h4>
               <ul className="space-y-2 text-sm">
+                <li><Link href="/legal/mentions-legales" className="hover:text-white transition-colors">Mentions légales</Link></li>
+                <li><Link href="/legal/rgpd" className="hover:text-white transition-colors">RGPD</Link></li>
+                <li><Link href="/legal/cookies" className="hover:text-white transition-colors">Cookies</Link></li>
+                <li><a href="mailto:contact@diddyhome.com" className="hover:text-white transition-colors">Contact</a></li>
                 <li><Link href="/portfolio" className="hover:text-white transition-colors">Portfolio Diddy</Link></li>
-                <li><Link href="/external/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><Link href="/external/help" className="hover:text-white transition-colors">Aide</Link></li>
-                <li><Link href="/external/legal" className="hover:text-white transition-colors">Mentions légales</Link></li>
-                <li><Link href="/external/privacy" className="hover:text-white transition-colors">Confidentialité</Link></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 pt-8 text-center">
-            <p className="text-sm text-gray-400">
-              &copy; 2025 DiddyHome. Tous droits réservés. Plateforme multisite connectée.
-            </p>
+          <div className="border-t border-gray-800 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+              <div className="text-center md:text-left mb-4 md:mb-0">
+                <p>&copy; 2025 DiddyHome. Tous droits réservés.</p>
+                <p className="text-xs mt-1">
+                  N° ORIAS : 15005935 - SIREN : 810571513 - Courtier en assurances
+                </p>
+              </div>
+              <div className="flex space-x-4">
+                <Link href="/legal/mentions-legales" className="hover:text-white transition-colors">Mentions légales</Link>
+                <Link href="/legal/rgpd" className="hover:text-white transition-colors">RGPD</Link>
+                <Link href="/legal/cookies" className="hover:text-white transition-colors">Cookies</Link>
+              </div>
+            </div>
           </div>
         </div>
       </footer>

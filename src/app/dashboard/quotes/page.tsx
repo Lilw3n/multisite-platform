@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { useAuth } from '@/contexts/MinimalAuthContext';
+import Modal from '@/components/ui/Modal';
 import InterlocutorSelector from '@/components/InterlocutorSelector';
 import VehicleSelector from '@/components/VehicleSelector';
 import CompanySelector from '@/components/CompanySelector';
@@ -92,6 +93,7 @@ export default function QuotesPage() {
   const [selectedInterlocutor, setSelectedInterlocutor] = useState<any>(null);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [selectedCompany, setSelectedCompany] = useState<any>(null);
+
 
   const getStatusColor = (status: Quote['status']) => {
     switch (status) {
@@ -582,28 +584,34 @@ export default function QuotesPage() {
               )}
 
               {/* Assistant intelligent de création de devis */}
-              {showIntelligentWizard && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 p-4 overflow-y-auto">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl my-8 min-h-[80vh]">
-                    <div className="p-6">
-                      <IntelligentQuoteWizard
-                        onComplete={handleIntelligentWizardComplete}
-                        onCancel={handleIntelligentWizardCancel}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+              <Modal
+                isOpen={showIntelligentWizard}
+                onClose={handleIntelligentWizardCancel}
+                title="🧠 Assistant IA - Évaluation Intelligente des Besoins"
+                size="xl"
+                enableKeyboard={true}
+              >
+                <IntelligentQuoteWizard
+                  onComplete={handleIntelligentWizardComplete}
+                  onCancel={handleIntelligentWizardCancel}
+                />
+              </Modal>
 
               {/* Assistant classique de création de devis */}
-              {showQuoteWizard && (
+              <Modal
+                isOpen={showQuoteWizard}
+                onClose={handleWizardCancel}
+                title="🧙‍♂️ Assistant Classique - Création de Devis"
+                size="lg"
+                enableKeyboard={true}
+              >
                 <QuoteContractWizard
                   type="quote"
                   onComplete={handleWizardComplete}
                   onCancel={handleWizardCancel}
-                  userRole={user?.role || 'admin'}
+                  userRole={'admin'}
                 />
-              )}
+              </Modal>
             </div>
           </main>
         </div>

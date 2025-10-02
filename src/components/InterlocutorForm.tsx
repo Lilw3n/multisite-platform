@@ -33,10 +33,15 @@ export default function InterlocutorForm({
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [validationMessages, setValidationMessages] = useState({
+    email: '',
+    phone: '',
+    contact: ''
+  });
 
   useEffect(() => {
     if (initialData) {
-      setFormData({
+      const newFormData = {
         type: initialData.type || 'user',
         firstName: initialData.firstName || '',
         lastName: initialData.lastName || '',
@@ -46,14 +51,35 @@ export default function InterlocutorForm({
         address: initialData.address || '',
         status: initialData.status || 'Actif',
         role: initialData.role || 'client'
-      });
+      };
+      setFormData(newFormData);
+      
+      // Initialiser la validation
+      const messages = validateContactFields(newFormData.email, newFormData.phone);
+      setValidationMessages(messages);
     }
   }, [initialData]);
+
+  // Initialiser la validation au chargement
+  useEffect(() => {
+    const messages = validateContactFields(formData.email, formData.phone);
+    setValidationMessages(messages);
+  }, [userRole]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+
+    // Validation côté client
+    const hasEmail = formData.email && formData.email.trim() !== '';
+    const hasPhone = formData.phone && formData.phone.trim() !== '';
+    
+    if (userRole === 'external' && !hasEmail && !hasPhone) {
+      setError('En mode externe, vous devez fournir au moins un email ou un téléphone.');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       let result;
@@ -76,12 +102,59 @@ export default function InterlocutorForm({
     }
   };
 
+  // Fonction de validation des champs de contact
+  const validateContactFields = (email: string, phone: string) => {
+    const hasEmail = email && email.trim() !== '';
+    const hasPhone = phone && phone.trim() !== '';
+    
+    const messages = {
+      email: '',
+      phone: '',
+      contact: ''
+    };
+
+    if (userRole === 'external') {
+      // Pour les externes, au moins un contact est requis
+      if (!hasEmail && !hasPhone) {
+        messages.contact = 'En mode externe, vous devez fournir au moins un email ou un téléphone.';
+      }
+    }
+
+    // Messages d'aide selon la priorité
+    if (hasEmail && hasPhone) {
+      messages.email = 'Email prioritaire pour l\'identification';
+      messages.phone = 'Téléphone en complément';
+    } else if (hasEmail) {
+      messages.email = 'Email utilisé comme identifiant principal';
+      messages.phone = 'Téléphone optionnel';
+    } else if (hasPhone) {
+      messages.phone = 'Téléphone utilisé comme identifiant principal';
+      messages.email = 'Email optionnel';
+    } else {
+      messages.email = 'Email optionnel (prioritaire si fourni)';
+      messages.phone = 'Téléphone optionnel';
+    }
+
+    return messages;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
+    const newFormData = {
+      ...formData,
       [name]: value
-    }));
+    };
+    
+    setFormData(newFormData);
+    
+    // Validation en temps réel pour les champs de contact
+    if (name === 'email' || name === 'phone') {
+      const messages = validateContactFields(
+        name === 'email' ? value : newFormData.email,
+        name === 'phone' ? value : newFormData.phone
+      );
+      setValidationMessages(messages);
+    }
   };
 
   const isExternalUser = userRole === 'external';
@@ -115,15 +188,30 @@ export default function InterlocutorForm({
       )}
 
       {isExternalUser && (
-        <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <span className="text-yellow-500">⚠️</span>
+              <span className="text-blue-500">ℹ️</span>
             </div>
             <div className="ml-3">
-              <p className="text-sm text-yellow-700">
-                <strong>Restriction externe :</strong> Vous ne pouvez créer qu'un seul interlocuteur. 
-                L'email et le téléphone doivent être uniques dans le système.
+              <p className="text-sm text-blue-700">
+                <strong>Mode externe :</strong> Vous devez fournir au moins un email ou un téléphone. 
+                L'email est prioritaire si les deux sont fournis. Vous ne pouvez créer qu'un seul interlocuteur.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {validationMessages.contact && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <span className="text-red-500">❌</span>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">
+                {validationMessages.contact}
               </p>
             </div>
           </div>
@@ -184,7 +272,7 @@ export default function InterlocutorForm({
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email *
+              Email {formData.email && formData.phone ? '(prioritaire)' : formData.email ? '(principal)' : ''}
             </label>
             <input
               type="email"
@@ -192,11 +280,14 @@ export default function InterlocutorForm({
               value={formData.email}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
             />
-            {isExternalUser && (
-              <p className="text-xs text-gray-500 mt-1">
-                Cet email doit être unique dans le système
+            {validationMessages.email && (
+              <p className={`text-xs mt-1 ${
+                validationMessages.email.includes('prioritaire') || validationMessages.email.includes('principal') 
+                  ? 'text-blue-600' 
+                  : 'text-gray-500'
+              }`}>
+                {validationMessages.email}
               </p>
             )}
           </div>
@@ -204,7 +295,7 @@ export default function InterlocutorForm({
           {/* Téléphone */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Téléphone *
+              Téléphone {!formData.email && formData.phone ? '(principal)' : formData.phone ? '(complément)' : ''}
             </label>
             <input
               type="tel"
@@ -212,11 +303,14 @@ export default function InterlocutorForm({
               value={formData.phone}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
             />
-            {isExternalUser && (
-              <p className="text-xs text-gray-500 mt-1">
-                Ce téléphone doit être unique dans le système
+            {validationMessages.phone && (
+              <p className={`text-xs mt-1 ${
+                validationMessages.phone.includes('principal') 
+                  ? 'text-blue-600' 
+                  : 'text-gray-500'
+              }`}>
+                {validationMessages.phone}
               </p>
             )}
           </div>

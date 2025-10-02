@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Event, EventParticipant, EventAttachment } from '@/types/interlocutor';
+import { getCurrentDateForInput, getCurrentTimeRoundedUp } from '@/lib/dateUtils';
 
 interface EventTimelineProps {
   events: Event[];
@@ -25,8 +26,8 @@ export default function EventTimeline({
     type: 'call' as const,
     title: '',
     description: '',
-    date: new Date().toISOString().split('T')[0],
-    time: new Date().toTimeString().slice(0, 5),
+    date: getCurrentDateForInput(), // Date actuelle
+    time: getCurrentTimeRoundedUp(), // Heure actuelle arrondie au quart d'heure supérieur
     participants: [] as EventParticipant[],
     attachments: [] as EventAttachment[],
     status: 'completed' as const,
@@ -75,8 +76,8 @@ export default function EventTimeline({
       type: 'call',
       title: '',
       description: '',
-      date: new Date().toISOString().split('T')[0],
-      time: new Date().toTimeString().slice(0, 5),
+      date: getCurrentDateForInput(), // Date actuelle
+      time: getCurrentTimeRoundedUp(), // Heure actuelle arrondie
       participants: [],
       attachments: [],
       status: 'completed',

@@ -13,6 +13,7 @@ import ModuleUnlinkManager from '@/components/ModuleUnlinkManager';
 import EventForm from '@/components/EventForm';
 import ModuleAddForm from '@/components/ModuleAddForm';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
+import { ConfirmationModal } from '@/components/ui/Modal';
 import SmartEventsTimeline from '@/components/events/SmartEventsTimeline';
 import { SmartEventsService } from '@/lib/smartEventsService';
 import EligibilityChecker from '@/components/EligibilityChecker';
@@ -255,50 +256,62 @@ export default function InterlocutorDetailPage() {
         break;
       case 'sinistre':
         // Ouvrir le formulaire de modification de sinistre avec les données existantes
-        const claim = interlocutor.claims.find(c => c.id === id);
-        if (claim) {
-          setEditingClaim(claim);
-          setShowClaimEditForm(true);
+        if (interlocutor) {
+          const claim = interlocutor.claims.find(c => c.id === id);
+          if (claim) {
+            setEditingClaim(claim);
+            setShowClaimEditForm(true);
+          }
         }
         break;
       case 'véhicule':
         // Ouvrir le formulaire de modification de véhicule avec les données existantes
-        const vehicle = interlocutor.vehicles.find(v => v.id === id);
-        if (vehicle) {
-          setEditingVehicle(vehicle);
-          setShowVehicleEditForm(true);
+        if (interlocutor) {
+          const vehicle = interlocutor.vehicles.find(v => v.id === id);
+          if (vehicle) {
+            setEditingVehicle(vehicle);
+            setShowVehicleEditForm(true);
+          }
         }
         break;
       case 'conducteur':
         // Ouvrir le formulaire de modification de conducteur avec les données existantes
-        const driver = interlocutor.drivers.find(d => d.id === id);
-        if (driver) {
-          setEditingDriver(driver);
-          setShowDriverEditForm(true);
+        if (interlocutor) {
+          const driver = interlocutor.drivers.find(d => d.id === id);
+          if (driver) {
+            setEditingDriver(driver);
+            setShowDriverEditForm(true);
+          }
         }
         break;
       case 'contrat':
         // Ouvrir le formulaire de modification de contrat avec les données existantes
-        const contract = interlocutor.contracts.find(c => c.id === id);
-        if (contract) {
-          setEditingContract(contract);
-          setShowContractEditForm(true);
+        if (interlocutor) {
+          const contract = interlocutor.contracts.find(c => c.id === id);
+          if (contract) {
+            setEditingContract(contract);
+            setShowContractEditForm(true);
+          }
         }
         break;
       case 'demande':
         // Ouvrir le formulaire de modification de demande avec les données existantes
-        const request = interlocutor.insuranceRequests.find(r => r.id === id);
-        if (request) {
-          setEditingRequest(request);
-          setShowRequestEditForm(true);
+        if (interlocutor) {
+          const request = interlocutor.insuranceRequests.find(r => r.id === id);
+          if (request) {
+            setEditingRequest(request);
+            setShowRequestEditForm(true);
+          }
         }
         break;
       case 'event':
         // Ouvrir le formulaire de modification d'événement avec les données existantes
-        const event = interlocutor.events.find(e => e.id === id);
-        if (event) {
-          setEditingEvent(event);
-          setShowEventEditForm(true);
+        if (interlocutor) {
+          const event = interlocutor.events.find(e => e.id === id);
+          if (event) {
+            setEditingEvent(event);
+            setShowEventEditForm(true);
+          }
         }
         break;
       default:
@@ -852,7 +865,7 @@ export default function InterlocutorDetailPage() {
                         {interlocutor.address && (
                           <p className="flex items-center">
                             <span className="w-5 h-5 mr-2">📍</span>
-                            {interlocutor.address.street}, {interlocutor.address.postalCode} {interlocutor.address.city}, {interlocutor.address.country}
+                            {interlocutor.address}
                           </p>
                 )}
               </div>
@@ -1659,7 +1672,7 @@ export default function InterlocutorDetailPage() {
                             </div>
                             <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
                               <span className="font-medium">📄 N°: {contract.policyNumber || 'N/A'}</span>
-                              <span className="font-medium">👤 Chargé: {contract.assignedTo || 'Non assigné'}</span>
+                              <span className="font-medium">🏢 Assureur: {contract.insurer || 'Non défini'}</span>
                             </div>
               </div>
                           <div className="flex space-x-2">
@@ -1815,14 +1828,14 @@ export default function InterlocutorDetailPage() {
              )}
 
              {showDeleteModal && deleteItem && (
-               <DeleteConfirmModal
+               <ConfirmationModal
                  isOpen={showDeleteModal}
                  onConfirm={handleDeleteConfirm}
-                 onCancel={handleDeleteCancel}
+                 onClose={handleDeleteCancel}
                  title="Confirmer la suppression"
-                 message="Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible."
-                 itemName={deleteItem.name}
-                 isLoading={isDeleting}
+                 message={`Êtes-vous sûr de vouloir supprimer "${deleteItem.name}" ? Cette action est irréversible.`}
+                 confirmText={isDeleting ? "Suppression..." : "Supprimer"}
+                 type="danger"
                />
              )}
 
@@ -2094,10 +2107,10 @@ export default function InterlocutorDetailPage() {
             {showEventForm && interlocutor && (
               <EventForm
                 interlocutorId={interlocutor.id}
-                onSuccess={() => {
+                onSuccess={async () => {
                   setShowEventForm(false);
                   // Recharger les données de l'interlocuteur
-                  const updatedInterlocutor = InterlocutorService.getInterlocutorById(interlocutor.id);
+                  const updatedInterlocutor = await InterlocutorService.getInterlocutorById(interlocutor.id);
                   if (updatedInterlocutor) {
                     setInterlocutor(updatedInterlocutor);
                   }

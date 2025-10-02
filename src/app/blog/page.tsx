@@ -193,11 +193,11 @@ export default function BlogPage() {
                   <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all">
                     <div className="aspect-video bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 relative">
                       <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                        <span className="text-white text-6xl">{getCategoryIcon(posts[0].category)}</span>
+                        <span className="text-white text-6xl">{getCategoryIcon(posts[0].category.id)}</span>
                       </div>
                       <div className="absolute top-6 left-6">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getCategoryColor(posts[0].category)}`}>
-                          {categories.find(c => c.id === posts[0].category)?.name}
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getCategoryColor(posts[0].category.id)}`}>
+                          {categories.find(c => c.id === posts[0].category.id)?.name}
                         </span>
                       </div>
                       <div className="absolute bottom-6 right-6 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
@@ -254,13 +254,13 @@ export default function BlogPage() {
                       <div className="p-6">
                         <div className="flex items-start space-x-6">
                           <div className="w-32 h-32 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl flex-shrink-0 flex items-center justify-center">
-                            <span className="text-3xl">{getCategoryIcon(post.category)}</span>
+                            <span className="text-3xl">{getCategoryIcon(post.category.id)}</span>
                           </div>
                           
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-3 mb-3">
-                              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getCategoryColor(post.category)}`}>
-                                {categories.find(c => c.id === post.category)?.name}
+                              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getCategoryColor(post.category.id)}`}>
+                                {categories.find(c => c.id === post.category.id)?.name}
                               </span>
                               {post.targetAudience.includes('professionnels') && (
                                 <span className="px-3 py-1 bg-purple-100 text-purple-700 border border-purple-200 rounded-full text-sm font-medium">

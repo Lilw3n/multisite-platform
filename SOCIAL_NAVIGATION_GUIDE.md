@@ -290,8 +290,14 @@ DiddyHome est une plateforme multisite connectée révolutionnaire avec un écos
 - **Création Multi-Source**: Dashboard + Externe/Register synchronisés
 - **Système d'Événements Dual Révolutionnaire**:
   - **📝 Événements Classiques**: Système original avec formulaires complets
-    - **🔍 Recherche Temps Réel**: Dans titre, description, créateur, participants
+    - **🧠 Recherche IA Révolutionnaire**: 
+      - **🔤 Sans Accents**: café = cafe, réunion = reunion
+      - **📝 Synonymes Métier**: appel = téléphone = RDV = meeting
+      - **🎯 Contexte Thématique**: assurance = police/garantie/prime
+      - **📋 Guillemets Exacts**: "texte exact" pour recherche précise
+      - **🧠 Toggle IA/Normal**: Bouton pour activer recherche intelligente
     - **📊 4 Filtres Combinables**: Type, Statut, Priorité, Date
+    - **📊 Tri Avancé**: Date création OU date choisie + ordre croissant/décroissant
     - **🎯 Interface Moderne**: Compteur dynamique, reset intelligent
     - **💬 UX Parfaite**: Message vide, suggestions, transitions fluides
   - **🧠 Timeline Intelligente**: Analytics, sentiment, métriques avancées
@@ -429,10 +435,17 @@ DiddyHome est une plateforme multisite connectée révolutionnaire avec un écos
 ### 📊 Pour Gérer les Événements (Système Dual):
 1. **Allez sur**: `http://localhost:3008/dashboard/interlocutors/1`
 2. **Section Événements Classiques**:
-   - **🔍 Recherchez**: Tapez dans la barre (temps réel)
-   - **📊 Filtrez**: 4 filtres combinables (Type/Statut/Priorité/Date)
-   - **📈 Compteur**: Voir nombre d'événements filtrés
-   - **🔄 Reset**: Bouton pour réinitialiser tous filtres
+  - **🧠 Recherche IA**: Cliquez le bouton "🧠 IA" pour activer
+    - **Tapez "appel"** → Trouve "téléphone", "coup de fil", "call"
+    - **Tapez "reunion"** → Trouve "RDV", "meeting", "entretien"  
+    - **Tapez "assurance"** → Trouve "police", "garantie", "contrat"
+    - **Tapez "café"** → Trouve "cafe" (sans accent)
+    - **Tapez "texte exact"** → Recherche exacte avec guillemets
+  - **🔍 Recherche Normale**: Mode par défaut, sans accents
+  - **📊 Filtrez**: 4 filtres combinables (Type/Statut/Priorité/Date)
+  - **📊 Triez**: Date création OU date choisie + ordre croissant/décroissant
+  - **📈 Compteur**: Voir nombre d'événements filtrés
+  - **🔄 Reset**: Bouton pour réinitialiser tout (filtres + tri + IA)
 3. **Section Timeline IA**: Analytics avancées et métriques
 4. **Actions**: Lier, Délier, Modifier, Supprimer avec confirmations
 5. **Créez**: Bouton + Ajouter → Formulaire complet
@@ -455,9 +468,15 @@ DiddyHome est une plateforme multisite connectée révolutionnaire avec un écos
 
 ### ✅ **SYSTÈMES UNIFIÉS**:
 - 🧠 **Événements Dual**: Classique + IA Timeline coexistent
-  - **🔍 Recherche Temps Réel**: Dans tous champs événements
+  - **🧠 Recherche IA Révolutionnaire**: Synonymes + contexte + sans accents
+    - **🔤 Normalisation**: café = cafe, réunion = reunion
+    - **📝 Synonymes**: appel = téléphone = RDV = meeting
+    - **🎯 Contextes**: assurance = police/garantie/prime
+    - **📋 Guillemets**: "texte exact" pour recherche précise
+    - **🧠 Toggle**: Bouton IA/Normal avec aide contextuelle
+  - **📊 Tri Avancé**: Date création OU date choisie + ordre croissant/décroissant
   - **📊 4 Filtres Combinables**: Type, Statut, Priorité, Date
-  - **🎯 Interface Moderne**: Compteur, reset, UX parfaite
+  - **🎯 Interface Moderne**: Compteur, reset complet, UX parfaite
 - 👥 **Interlocuteurs Multi-Source**: Dashboard + Externe synchronisés
 - 🤖 **Triple Assistants**: IA + Classique + Simple pour devis
 - 🔄 **Synchronisation**: Bidirectionnelle parfaite entre tous systèmes

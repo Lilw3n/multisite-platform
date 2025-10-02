@@ -592,8 +592,8 @@ export default function SmartEventsTimeline({
         </div>
       )}
 
-      {/* Boutons d'action pour événements legacy */}
-      {event.workflow.stage === 'legacy' && (
+      {/* Boutons d'action pour TOUS les événements */}
+      {true && (
         <div className="mt-3 pt-3 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-500">Actions:</span>
@@ -1489,14 +1489,165 @@ export default function SmartEventsTimeline({
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 mt-6 pt-6 border-t">
+              {/* Boutons d'action pour TOUS les événements */}
+              <div className="mt-6 pt-6 border-t">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium text-gray-700">Actions:</span>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => {
+                          // Logique pour lier l'événement à l'interlocuteur
+                          if (interlocutorId && selectedEvent) {
+                            try {
+                              const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
+                              
+                              if (interlocutor) {
+                                // Ajouter l'événement à l'interlocuteur s'il n'existe pas déjà
+                                const existingEvent = interlocutor.events?.find((e: any) => e.id === selectedEvent.id);
+                                if (!existingEvent) {
+                                  const legacyEvent = {
+                                    id: selectedEvent.id,
+                                    title: selectedEvent.title,
+                                    description: selectedEvent.description,
+                                    type: selectedEvent.classification.category,
+                                    date: selectedEvent.timestamps.scheduledAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+                                    time: selectedEvent.timestamps.scheduledAt?.split('T')[1]?.substring(0, 5) || '00:00',
+                                    status: selectedEvent.workflow.status === 'completed' ? 'completed' : 'pending',
+                                    priority: selectedEvent.classification.priority,
+                                    participants: selectedEvent.participants.recipients.map(r => ({ name: r.name, role: r.role })),
+                                    createdAt: selectedEvent.timestamps.createdAt,
+                                    createdBy: selectedEvent.participants.creator.name,
+                                    attachments: selectedEvent.attachments
+                                  };
+                                  
+                                  const updatedInterlocutor = {
+                                    ...interlocutor,
+                                    events: [...(interlocutor.events || []), legacyEvent]
+                                  };
+                                  
+                                  InterlocutorService.updateInterlocutor(updatedInterlocutor);
+                                  alert('✅ Événement lié avec succès à l\'interlocuteur !');
+                                  setSelectedEvent(null);
+                                  window.location.reload();
+                                } else {
+                                  alert('ℹ️ Cet événement est déjà lié à cet interlocuteur.');
+                                }
+                              }
+                            } catch (error) {
+                              console.error('Erreur liaison événement:', error);
+                              alert('❌ Erreur lors de la liaison de l\'événement.');
+                            }
+                          }
+                        }}
+                        className="px-3 py-1.5 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                        title="Lier à l'interlocuteur"
+                      >
+                        🔗 Lier
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Logique pour délier l'événement de l'interlocuteur
+                          if (interlocutorId && selectedEvent && confirm('Êtes-vous sûr de vouloir délier cet événement de l\'interlocuteur ?')) {
+                            try {
+                              const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
+                              
+                              if (interlocutor) {
+                                // Supprimer l'événement de l'interlocuteur
+                                const updatedInterlocutor = {
+                                  ...interlocutor,
+                                  events: (interlocutor.events || []).filter((e: any) => e.id !== selectedEvent.id)
+                                };
+                                
+                                InterlocutorService.updateInterlocutor(updatedInterlocutor);
+                                alert('✅ Événement délié avec succès de l\'interlocuteur !');
+                                setSelectedEvent(null);
+                                window.location.reload();
+                              }
+                            } catch (error) {
+                              console.error('Erreur déliaison événement:', error);
+                              alert('❌ Erreur lors de la déliaison de l\'événement.');
+                            }
+                          }
+                        }}
+                        className="px-3 py-1.5 text-sm bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors"
+                        title="Délier de l'interlocuteur"
+                      >
+                        🔓 Délier
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Logique pour modifier l'événement
+                          if (selectedEvent) {
+                            // TODO: Ouvrir modal d'édition
+                            alert('🚧 Fonction de modification en cours de développement...');
+                            console.log('Modifier événement:', selectedEvent.id);
+                          }
+                        }}
+                        className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                        title="Modifier l'événement"
+                      >
+                        ✏️ Modifier
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Logique pour supprimer l'événement
+                          if (selectedEvent && confirm('Êtes-vous sûr de vouloir supprimer définitivement cet événement ?')) {
+                            try {
+                              // Supprimer de SmartEventsService
+                              SmartEventsService.deleteEvent(selectedEvent.id);
+                              
+                              // Supprimer aussi de l'interlocuteur si lié
+                              if (interlocutorId) {
+                                const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
+                                
+                                if (interlocutor) {
+                                  const updatedInterlocutor = {
+                                    ...interlocutor,
+                                    events: (interlocutor.events || []).filter((e: any) => e.id !== selectedEvent.id)
+                                  };
+                                  
+                                  InterlocutorService.updateInterlocutor(updatedInterlocutor);
+                                }
+                              }
+                              
+                              alert('✅ Événement supprimé avec succès !');
+                              setSelectedEvent(null);
+                              window.location.reload();
+                            } catch (error) {
+                              console.error('Erreur suppression événement:', error);
+                              alert('❌ Erreur lors de la suppression de l\'événement.');
+                            }
+                          }
+                        }}
+                        className="px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                        title="Supprimer définitivement"
+                      >
+                        🗑️ Supprimer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-4 pt-4 border-t">
                 <button
                   onClick={() => setSelectedEvent(null)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                 >
                   Fermer
                 </button>
-                <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                <button 
+                  onClick={() => {
+                    // Marquer comme traité
+                    if (selectedEvent) {
+                      // TODO: Implémenter logique de marquage
+                      alert('✅ Événement marqué comme traité !');
+                      setSelectedEvent(null);
+                    }
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                >
                   Marquer comme traité
                 </button>
               </div>

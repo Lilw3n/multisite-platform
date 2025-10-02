@@ -21,12 +21,20 @@ export default function InterlocutorSearchPage() {
         email: 'jean.dupont@company.com',
         phone: '01 23 45 67 89',
         company: 'Transport Dupont SARL',
-        address: '123 Rue de la Paix, 75001 Paris',
+        address: {
+          street: '123 Rue de la Paix',
+          city: 'Paris',
+          postalCode: '75001',
+          country: 'France'
+        },
         status: 'Actif',
         role: 'client',
         createdAt: '2024-01-15',
         updatedAt: '2025-01-15',
         lastActivity: '2025-01-15',
+        events: [],
+        familyMembers: [],
+        companyRelations: [],
         contracts: [
           {
             id: 'c1',

@@ -6,7 +6,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { useAuth } from '@/contexts/MinimalAuthContext';
-import { Interlocutor } from '@/types/interlocutor';
+import { Interlocutor, Claim, Vehicle, Driver } from '@/types/interlocutor';
 import { InterlocutorService } from '@/lib/interlocutors';
 import ModuleLinkManager from '@/components/ModuleLinkManager';
 import ModuleUnlinkManager from '@/components/ModuleUnlinkManager';
@@ -17,6 +17,9 @@ import EligibilityChecker from '@/components/EligibilityChecker';
 import CompanyForm from '@/components/CompanyForm';
 import FamilyForm from '@/components/FamilyForm';
 import InterlocutorEditForm from '@/components/InterlocutorEditForm';
+import ClaimForm from '@/components/ClaimForm';
+import VehicleForm from '@/components/VehicleForm';
+import DriverForm from '@/components/DriverForm';
 import { useClientSide } from '@/hooks/useClientSide';
 import { Company, Family } from '@/types';
 
@@ -48,6 +51,20 @@ export default function InterlocutorDetailPage() {
   const [showEditForm, setShowEditForm] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [family, setFamily] = useState<Family | null>(null);
+  
+  // États pour les formulaires de modification
+  const [showClaimEditForm, setShowClaimEditForm] = useState(false);
+  const [showVehicleEditForm, setShowVehicleEditForm] = useState(false);
+  const [showDriverEditForm, setShowDriverEditForm] = useState(false);
+  const [showContractEditForm, setShowContractEditForm] = useState(false);
+  const [showRequestEditForm, setShowRequestEditForm] = useState(false);
+  const [showEventEditForm, setShowEventEditForm] = useState(false);
+  const [editingClaim, setEditingClaim] = useState<Claim | null>(null);
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
+  const [editingContract, setEditingContract] = useState<any>(null);
+  const [editingRequest, setEditingRequest] = useState<any>(null);
+  const [editingEvent, setEditingEvent] = useState<any>(null);
 
   useEffect(() => {
     // Vérifier le mode simulation
@@ -197,8 +214,84 @@ export default function InterlocutorDetailPage() {
   };
 
   const handleModifyModule = (type: string, id: string) => {
-    // Pour l'instant, on affiche une alerte. Plus tard, on pourra implémenter un formulaire de modification
-    alert(`Modification de ${type} ${id} - Fonctionnalité à implémenter`);
+    // Fermer tous les autres formulaires d'abord
+    setShowEditForm(false);
+    setShowCompanyForm(false);
+    setShowFamilyForm(false);
+    setShowClaimEditForm(false);
+    setShowVehicleEditForm(false);
+    setShowDriverEditForm(false);
+    setShowContractEditForm(false);
+    setShowRequestEditForm(false);
+    setShowEventEditForm(false);
+    setEditingClaim(null);
+    setEditingVehicle(null);
+    setEditingDriver(null);
+    setEditingContract(null);
+    setEditingRequest(null);
+    setEditingEvent(null);
+
+    switch (type) {
+      case 'interlocutor':
+        setShowEditForm(true);
+        break;
+      case 'company':
+        setShowCompanyForm(true);
+        break;
+      case 'family':
+        setShowFamilyForm(true);
+        break;
+      case 'sinistre':
+        // Ouvrir le formulaire de modification de sinistre avec les données existantes
+        const claim = interlocutor.claims.find(c => c.id === id);
+        if (claim) {
+          setEditingClaim(claim);
+          setShowClaimEditForm(true);
+        }
+        break;
+      case 'véhicule':
+        // Ouvrir le formulaire de modification de véhicule avec les données existantes
+        const vehicle = interlocutor.vehicles.find(v => v.id === id);
+        if (vehicle) {
+          setEditingVehicle(vehicle);
+          setShowVehicleEditForm(true);
+        }
+        break;
+      case 'conducteur':
+        // Ouvrir le formulaire de modification de conducteur avec les données existantes
+        const driver = interlocutor.drivers.find(d => d.id === id);
+        if (driver) {
+          setEditingDriver(driver);
+          setShowDriverEditForm(true);
+        }
+        break;
+      case 'contrat':
+        // Ouvrir le formulaire de modification de contrat avec les données existantes
+        const contract = interlocutor.contracts.find(c => c.id === id);
+        if (contract) {
+          setEditingContract(contract);
+          setShowContractEditForm(true);
+        }
+        break;
+      case 'demande':
+        // Ouvrir le formulaire de modification de demande avec les données existantes
+        const request = interlocutor.insuranceRequests.find(r => r.id === id);
+        if (request) {
+          setEditingRequest(request);
+          setShowRequestEditForm(true);
+        }
+        break;
+      case 'event':
+        // Ouvrir le formulaire de modification d'événement avec les données existantes
+        const event = interlocutor.events.find(e => e.id === id);
+        if (event) {
+          setEditingEvent(event);
+          setShowEventEditForm(true);
+        }
+        break;
+      default:
+        alert(`Modification de ${type} ${id} - Fonctionnalité à implémenter`);
+    }
   };
 
   const handleCompanySuccess = (companyData: Company) => {
@@ -220,6 +313,66 @@ export default function InterlocutorDetailPage() {
     setShowEditForm(false);
     // Ici vous pourriez sauvegarder en base de données
     console.log('Interlocuteur modifié:', updatedInterlocutor);
+  };
+
+  const handleClaimEditSuccess = (updatedClaim: Claim) => {
+    if (interlocutor) {
+      const updatedClaims = interlocutor.claims.map(c => c.id === updatedClaim.id ? updatedClaim : c);
+      setInterlocutor({ ...interlocutor, claims: updatedClaims });
+    }
+    setShowClaimEditForm(false);
+    setEditingClaim(null);
+    console.log('Sinistre modifié:', updatedClaim);
+  };
+
+  const handleVehicleEditSuccess = (updatedVehicle: Vehicle) => {
+    if (interlocutor) {
+      const updatedVehicles = interlocutor.vehicles.map(v => v.id === updatedVehicle.id ? updatedVehicle : v);
+      setInterlocutor({ ...interlocutor, vehicles: updatedVehicles });
+    }
+    setShowVehicleEditForm(false);
+    setEditingVehicle(null);
+    console.log('Véhicule modifié:', updatedVehicle);
+  };
+
+  const handleDriverEditSuccess = (updatedDriver: Driver) => {
+    if (interlocutor) {
+      const updatedDrivers = interlocutor.drivers.map(d => d.id === updatedDriver.id ? updatedDriver : d);
+      setInterlocutor({ ...interlocutor, drivers: updatedDrivers });
+    }
+    setShowDriverEditForm(false);
+    setEditingDriver(null);
+    console.log('Conducteur modifié:', updatedDriver);
+  };
+
+  const handleContractEditSuccess = (updatedContract: any) => {
+    if (interlocutor) {
+      const updatedContracts = interlocutor.contracts.map(c => c.id === updatedContract.id ? updatedContract : c);
+      setInterlocutor({ ...interlocutor, contracts: updatedContracts });
+    }
+    setShowContractEditForm(false);
+    setEditingContract(null);
+    console.log('Contrat modifié:', updatedContract);
+  };
+
+  const handleRequestEditSuccess = (updatedRequest: any) => {
+    if (interlocutor) {
+      const updatedRequests = interlocutor.insuranceRequests.map(r => r.id === updatedRequest.id ? updatedRequest : r);
+      setInterlocutor({ ...interlocutor, insuranceRequests: updatedRequests });
+    }
+    setShowRequestEditForm(false);
+    setEditingRequest(null);
+    console.log('Demande modifiée:', updatedRequest);
+  };
+
+  const handleEventEditSuccess = (updatedEvent: any) => {
+    if (interlocutor) {
+      const updatedEvents = interlocutor.events.map(e => e.id === updatedEvent.id ? updatedEvent : e);
+      setInterlocutor({ ...interlocutor, events: updatedEvents });
+    }
+    setShowEventEditForm(false);
+    setEditingEvent(null);
+    console.log('Événement modifié:', updatedEvent);
   };
 
   // Afficher le chargement pendant la vérification de l'authentification
@@ -870,6 +1023,20 @@ export default function InterlocutorDetailPage() {
                                       >
                                         Délier
                                       </button>
+                                      <button 
+                                        onClick={() => handleModifyModule('event', event.id)}
+                                        className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs font-medium"
+                                        title="Modifier"
+                                      >
+                                        Modifier
+                                      </button>
+                                      <button 
+                                        onClick={() => handleDeleteModule('events', event.id, event.title)}
+                                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium"
+                                        title="Supprimer"
+                                      >
+                                        Supprimer
+                                      </button>
                       </div>
                       </div>
                     </div>
@@ -1166,7 +1333,10 @@ export default function InterlocutorDetailPage() {
                             >
                               Délier
                             </button>
-                            <button className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-md text-sm font-medium">
+                            <button 
+                              onClick={() => handleModifyModule('contrat', contract.id)}
+                              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-md text-sm font-medium"
+                            >
                               Modifier
                             </button>
                             <button className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm font-medium">
@@ -1239,7 +1409,10 @@ export default function InterlocutorDetailPage() {
                             >
                               Délier
                             </button>
-                            <button className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-md text-sm font-medium">
+                            <button 
+                              onClick={() => handleModifyModule('demande', request.id)}
+                              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-md text-sm font-medium"
+                            >
                               Modifier
                             </button>
                             <button className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm font-medium">
@@ -1311,33 +1484,285 @@ export default function InterlocutorDetailPage() {
                />
              )}
 
-             {/* Formulaires Entreprise et Famille */}
+             {/* Formulaires Entreprise et Famille - Modales superposées */}
              {showCompanyForm && (
-               <CompanyForm
-                 interlocutorId={interlocutor?.id || ''}
-                 onSuccess={handleCompanySuccess}
-                 onCancel={() => setShowCompanyForm(false)}
-                 initialData={company || undefined}
-               />
+               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                 <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                   <div className="p-6">
+                     <div className="flex justify-between items-center mb-4">
+                       <h2 className="text-xl font-semibold text-gray-900">
+                         {company ? 'Modifier l\'entreprise' : 'Ajouter une entreprise'}
+                       </h2>
+                       <button
+                         onClick={() => setShowCompanyForm(false)}
+                         className="text-gray-400 hover:text-gray-600 text-2xl"
+                       >
+                         ×
+                       </button>
+                     </div>
+                     <CompanyForm
+                       interlocutorId={interlocutor?.id || ''}
+                       onSuccess={handleCompanySuccess}
+                       onCancel={() => setShowCompanyForm(false)}
+                       initialData={company || undefined}
+                     />
+                   </div>
+                 </div>
+               </div>
              )}
 
              {showFamilyForm && (
-               <FamilyForm
-                 interlocutorId={interlocutor?.id || ''}
-                 onSuccess={handleFamilySuccess}
-                 onCancel={() => setShowFamilyForm(false)}
-                 initialData={family || undefined}
-               />
+               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                 <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                   <div className="p-6">
+                     <div className="flex justify-between items-center mb-4">
+                       <h2 className="text-xl font-semibold text-gray-900">
+                         {family ? 'Modifier la famille' : 'Ajouter une famille'}
+                       </h2>
+                       <button
+                         onClick={() => setShowFamilyForm(false)}
+                         className="text-gray-400 hover:text-gray-600 text-2xl"
+                       >
+                         ×
+                       </button>
+                     </div>
+                     <FamilyForm
+                       interlocutorId={interlocutor?.id || ''}
+                       onSuccess={handleFamilySuccess}
+                       onCancel={() => setShowFamilyForm(false)}
+                       initialData={family || undefined}
+                     />
+                   </div>
+                 </div>
+               </div>
              )}
 
-             {/* Formulaire de modification de l'interlocuteur */}
+             {/* Formulaire de modification de l'interlocuteur - Modal superposé */}
              {showEditForm && interlocutor && (
-               <InterlocutorEditForm
-                 interlocutor={interlocutor}
-                 onSuccess={handleInterlocutorEditSuccess}
-                 onCancel={() => setShowEditForm(false)}
-               />
+               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                 <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                   <div className="p-6">
+                     <div className="flex justify-between items-center mb-4">
+                       <h2 className="text-xl font-semibold text-gray-900">Modifier l'interlocuteur</h2>
+                       <button
+                         onClick={() => setShowEditForm(false)}
+                         className="text-gray-400 hover:text-gray-600 text-2xl"
+                       >
+                         ×
+                       </button>
+                     </div>
+                     <InterlocutorEditForm
+                       interlocutor={interlocutor}
+                       onSuccess={handleInterlocutorEditSuccess}
+                       onCancel={() => setShowEditForm(false)}
+                     />
+                   </div>
+                 </div>
+               </div>
              )}
+
+             {/* Formulaires de modification des modules - Modales superposées */}
+             {showClaimEditForm && editingClaim && interlocutor && (
+               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                 <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                   <div className="p-6">
+                     <div className="flex justify-between items-center mb-4">
+                       <h2 className="text-xl font-semibold text-gray-900">Modifier le sinistre</h2>
+                       <button
+                         onClick={() => {
+                           setShowClaimEditForm(false);
+                           setEditingClaim(null);
+                         }}
+                         className="text-gray-400 hover:text-gray-600 text-2xl"
+                       >
+                         ×
+                       </button>
+                     </div>
+                     <ClaimForm
+                       interlocutorId={interlocutor.id}
+                       onSuccess={handleClaimEditSuccess}
+                       onCancel={() => {
+                         setShowClaimEditForm(false);
+                         setEditingClaim(null);
+                       }}
+                       initialData={editingClaim}
+                       isEditing={true}
+                     />
+                   </div>
+                 </div>
+               </div>
+             )}
+
+             {showVehicleEditForm && editingVehicle && interlocutor && (
+               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                 <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                   <div className="p-6">
+                     <div className="flex justify-between items-center mb-4">
+                       <h2 className="text-xl font-semibold text-gray-900">Modifier le véhicule</h2>
+                       <button
+                         onClick={() => {
+                           setShowVehicleEditForm(false);
+                           setEditingVehicle(null);
+                         }}
+                         className="text-gray-400 hover:text-gray-600 text-2xl"
+                       >
+                         ×
+                       </button>
+                     </div>
+                     <VehicleForm
+                       interlocutorId={interlocutor.id}
+                       onSuccess={handleVehicleEditSuccess}
+                       onCancel={() => {
+                         setShowVehicleEditForm(false);
+                         setEditingVehicle(null);
+                       }}
+                       initialData={editingVehicle}
+                       isEditing={true}
+                     />
+                   </div>
+                 </div>
+               </div>
+             )}
+
+             {showDriverEditForm && editingDriver && interlocutor && (
+               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                 <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                   <div className="p-6">
+                     <div className="flex justify-between items-center mb-4">
+                       <h2 className="text-xl font-semibold text-gray-900">Modifier le conducteur</h2>
+                       <button
+                         onClick={() => {
+                           setShowDriverEditForm(false);
+                           setEditingDriver(null);
+                         }}
+                         className="text-gray-400 hover:text-gray-600 text-2xl"
+                       >
+                         ×
+                       </button>
+                     </div>
+                     <DriverForm
+                       interlocutorId={interlocutor.id}
+                       onSuccess={handleDriverEditSuccess}
+                       onCancel={() => {
+                         setShowDriverEditForm(false);
+                         setEditingDriver(null);
+                       }}
+                       initialData={editingDriver}
+                       isEditing={true}
+                     />
+                   </div>
+                 </div>
+               </div>
+             )}
+
+             {/* Formulaires de modification des contrats, demandes et événements - Modales superposées */}
+             {showContractEditForm && editingContract && interlocutor && (
+               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                 <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                   <div className="p-6">
+                     <div className="flex justify-between items-center mb-4">
+                       <h2 className="text-xl font-semibold text-gray-900">Modifier le contrat</h2>
+                       <button
+                         onClick={() => {
+                           setShowContractEditForm(false);
+                           setEditingContract(null);
+                         }}
+                         className="text-gray-400 hover:text-gray-600 text-2xl"
+                       >
+                         ×
+                       </button>
+                     </div>
+                     <div className="text-center py-8">
+                       <p className="text-gray-600 mb-4">Formulaire de modification de contrat</p>
+                       <p className="text-sm text-gray-500 mb-6">
+                         Contrat: {editingContract.type} - {editingContract.insurer}
+                       </p>
+                       <div className="flex justify-center space-x-3">
+                         <button
+                           onClick={() => {
+                             setShowContractEditForm(false);
+                             setEditingContract(null);
+                           }}
+                           className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                         >
+                           Annuler
+                         </button>
+                         <button
+                           onClick={() => {
+                             handleContractEditSuccess(editingContract);
+                           }}
+                           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                         >
+                           Modifier
+                         </button>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             )}
+
+             {showRequestEditForm && editingRequest && interlocutor && (
+               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                 <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                   <div className="p-6">
+                     <div className="flex justify-between items-center mb-4">
+                       <h2 className="text-xl font-semibold text-gray-900">Modifier la demande</h2>
+                       <button
+                         onClick={() => {
+                           setShowRequestEditForm(false);
+                           setEditingRequest(null);
+                         }}
+                         className="text-gray-400 hover:text-gray-600 text-2xl"
+                       >
+                         ×
+                       </button>
+                     </div>
+                     <div className="text-center py-8">
+                       <p className="text-gray-600 mb-4">Formulaire de modification de demande d'assurance</p>
+                       <p className="text-sm text-gray-500 mb-6">
+                         Demande: {editingRequest.type} - {editingRequest.description}
+                       </p>
+                       <div className="flex justify-center space-x-3">
+                         <button
+                           onClick={() => {
+                             setShowRequestEditForm(false);
+                             setEditingRequest(null);
+                           }}
+                           className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                         >
+                           Annuler
+                         </button>
+                         <button
+                           onClick={() => {
+                             handleRequestEditSuccess(editingRequest);
+                           }}
+                           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                         >
+                           Modifier
+                         </button>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             )}
+
+            {showEventEditForm && editingEvent && interlocutor && (
+              <EventForm
+                interlocutorId={interlocutor.id}
+                existingEvent={editingEvent}
+                onSuccess={() => {
+                  handleEventEditSuccess(editingEvent);
+                  setShowEventEditForm(false);
+                  setEditingEvent(null);
+                }}
+                onCancel={() => {
+                  setShowEventEditForm(false);
+                  setEditingEvent(null);
+                }}
+              />
+            )}
            </ProtectedRoute>
   );
 }

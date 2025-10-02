@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, ViewMode, TestMode } from '@/types';
 import { AuthService } from '@/lib/auth';
+import { PersistentAuthService } from '@/lib/persistentAuth';
 
 interface AuthContextType {
   user: User | null;
@@ -45,25 +46,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   });
 
   useEffect(() => {
-    // Vérifier le token stocké au chargement
+    // Vérifier la session persistante au chargement
     if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem('auth_token');
-      if (storedToken) {
-        // Validation synchrone simple
-        try {
-          const user = AuthService.validateTokenSync(storedToken);
-          if (user) {
-            setUser(user);
-            setToken(storedToken);
-          } else {
-            localStorage.removeItem('auth_token');
-          }
-        } catch (error) {
-          console.error('Token validation error:', error);
-          localStorage.removeItem('auth_token');
+      try {
+        const session = PersistentAuthService.getSession();
+        if (session) {
+          setUser(session.user);
+          setToken(session.token);
         }
+      } catch (error) {
+        console.error('Session validation error:', error);
+        PersistentAuthService.clearSession();
       }
+      
+      // Configurer l'extension automatique de session
+      PersistentAuthService.setupAutoExtension();
     }
+    
     // Toujours arrêter le chargement
     setIsLoading(false);
   }, []);
@@ -72,14 +71,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const result = await AuthService.login(email, password);
+      const result = await PersistentAuthService.login(email, password);
       
       if (result) {
         setUser(result.user);
         setToken(result.token);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('auth_token', result.token);
-        }
         return true;
       }
       return false;
@@ -92,14 +88,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    if (token) {
-      AuthService.logout(token);
-    }
+    PersistentAuthService.logout();
     setUser(null);
     setToken(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-    }
     setViewMode({ type: 'admin', isSimulated: false });
     setTestMode({ isActive: false, logs: [] });
   };

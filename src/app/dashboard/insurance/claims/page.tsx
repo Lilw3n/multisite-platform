@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import ClaimForm from '@/components/ClaimForm';
 import { Claim } from '@/types/interlocutor';
+import { mockClaims } from '@/lib/mockData';
 
 export default function ClaimsPage() {
   const [user, setUser] = useState<{ email: string; name: string } | null>(null);
@@ -58,40 +59,24 @@ export default function ClaimsPage() {
     { id: 'settings', name: 'Paramètres', icon: '⚙️', href: '/dashboard/settings' },
   ];
 
-  // Données de démonstration
-  const mockClaims: Claim[] = [
-    {
-      id: 'SIN-2024-001',
-      interlocutorId: '1',
-      type: 'materialRC100',
-      date: '2024-01-10',
-      amount: 2500,
-      description: 'Accident sur autoroute A1',
-      responsible: true,
-      percentage: 100,
-      insurer: 'AXA',
-      status: 'En cours',
-      createdAt: '2024-01-10',
-      updatedAt: '2024-01-10'
-    },
-    {
-      id: 'SIN-2024-002',
-      interlocutorId: '1',
-      type: 'theft',
-      date: '2024-01-08',
-      amount: 0,
-      description: 'Véhicule volé dans un parking',
-      responsible: false,
-      percentage: 0,
-      insurer: 'Groupama',
-      status: 'Résolu',
-      createdAt: '2024-01-08',
-      updatedAt: '2024-01-08'
-    }
-  ];
-
   useEffect(() => {
-    setClaims(mockClaims);
+    // Utiliser les vraies données de mockData.ts
+    const realClaims: Claim[] = mockClaims.map(claim => ({
+      id: claim.claimNumber,
+      interlocutorId: '1', // ID par défaut pour l'affichage
+      type: 'materialRC100' as const, // Type par défaut
+      date: claim.incidentDate.toISOString().split('T')[0],
+      amount: claim.estimatedAmount || 0,
+      description: claim.description,
+      responsible: true, // Par défaut
+      percentage: 100, // Par défaut
+      insurer: claim.insurer,
+      status: claim.status === 'in_progress' ? 'En cours' : 
+              claim.status === 'closed' ? 'Résolu' : 'En attente',
+      createdAt: claim.createdAt.toISOString().split('T')[0],
+      updatedAt: claim.updatedAt.toISOString().split('T')[0]
+    }));
+    setClaims(realClaims);
   }, []);
 
   const handleClaimSuccess = (claim: Claim) => {
@@ -356,11 +341,11 @@ export default function ClaimsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {claim.vehicle}
+                          {claim.vehicle || 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {claim.driver}
+                        {claim.driver || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">

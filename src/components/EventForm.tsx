@@ -1,16 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Event } from '@/types/interlocutor';
 import { InterlocutorService } from '@/lib/interlocutors';
+import { useAuth } from '@/contexts/MinimalAuthContext';
 
 interface EventFormProps {
   interlocutorId: string;
   onSuccess: () => void;
   onCancel: () => void;
+  existingEvent?: Event; // si présent, on est en mode édition
 }
 
-export default function EventForm({ interlocutorId, onSuccess, onCancel }: EventFormProps) {
+export default function EventForm({ interlocutorId, onSuccess, onCancel, existingEvent }: EventFormProps) {
+  const { viewMode, user } = useAuth();
   const [formData, setFormData] = useState({
     type: 'call',
     title: '',
@@ -27,6 +30,25 @@ export default function EventForm({ interlocutorId, onSuccess, onCancel }: Event
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Pré-remplir en mode édition
+  useEffect(() => {
+    if (existingEvent) {
+      setFormData({
+        type: existingEvent.type,
+        title: existingEvent.title,
+        description: existingEvent.description,
+        date: existingEvent.date,
+        time: existingEvent.time,
+        participants: existingEvent.participants.map(p => ({ name: p.name, role: p.role })),
+        attachments: existingEvent.attachments.map(a => ({ name: a.name, type: a.type, url: a.url || '' })),
+        urls: existingEvent.urls?.map(u => ({ title: u.title, url: u.url, type: u.type })) || [{ title: '', url: '', type: 'link' }],
+        status: existingEvent.status,
+        priority: existingEvent.priority,
+        createdBy: existingEvent.createdBy
+      });
+    }
+  }, [existingEvent]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -117,6 +139,12 @@ export default function EventForm({ interlocutorId, onSuccess, onCancel }: Event
     setError('');
 
     try {
+      // Empêcher la création/modification depuis une interface externe
+      if (viewMode.type === 'external') {
+        setError('La création/modification d\'événement n\'est pas autorisée en interface externe.');
+        return;
+      }
+
       // Valider les données
       if (!formData.title.trim()) {
         setError('Le titre est requis');
@@ -176,10 +204,20 @@ export default function EventForm({ interlocutorId, onSuccess, onCancel }: Event
         })),
         status: formData.status as Event['status'],
         priority: formData.priority as Event['priority'],
-        createdBy: formData.createdBy.trim() || 'Utilisateur actuel'
+        createdBy: (viewMode.type === 'admin' || viewMode.type === 'internal')
+          ? (formData.createdBy.trim() || `${user?.firstName || 'Utilisateur'} ${user?.lastName || ''}`.trim())
+          : (existingEvent?.createdBy || 'Interlocuteur')
       };
 
-      const result = await InterlocutorService.createEvent(interlocutorId, eventData);
+      let result: { success: boolean; error?: string };
+      if (existingEvent) {
+        // Mise à jour
+        const updateRes = await InterlocutorService.updateEvent(interlocutorId, existingEvent.id, eventData);
+        result = { success: !!updateRes.success, error: updateRes.error };
+      } else {
+        // Création
+        result = await InterlocutorService.createEvent(interlocutorId, eventData);
+      }
       
       if (result.success) {
         onSuccess();
@@ -199,7 +237,7 @@ export default function EventForm({ interlocutorId, onSuccess, onCancel }: Event
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">
-              Ajouter un Événement
+              {existingEvent ? 'Modifier l\'événement' : 'Ajouter un Événement'}
             </h2>
             <button
               onClick={onCancel}
@@ -517,7 +555,7 @@ export default function EventForm({ interlocutorId, onSuccess, onCancel }: Event
                 disabled={isLoading}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Création...' : 'Créer l\'événement'}
+                {isLoading ? (existingEvent ? 'Enregistrement...' : 'Création...') : (existingEvent ? 'Enregistrer' : 'Créer l\'événement')}
               </button>
             </div>
           </form>

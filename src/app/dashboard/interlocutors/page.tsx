@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import { Interlocutor } from '@/types/interlocutor';
+import { InterlocutorService } from '@/lib/interlocutors';
 
 export default function InterlocutorsPage() {
   const [interlocutors, setInterlocutors] = useState<Interlocutor[]>([]);

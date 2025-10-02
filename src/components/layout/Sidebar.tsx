@@ -63,6 +63,14 @@ export default function Sidebar({ user, onLogout, userRole = 'admin', testMode =
       isActive: pathname.startsWith('/dashboard/interlocutors'),
       show: permissions.showInterlocutors
     },
+    { 
+      id: 'ai-suggestions', 
+      name: 'Suggestions IA', 
+      icon: '🤖', 
+      href: '/dashboard/ai-suggestions',
+      isActive: pathname.startsWith('/dashboard/ai-suggestions'),
+      show: permissions.showInsurance
+    },
     {
       id: 'financier',
       name: 'Financier',
@@ -82,13 +90,16 @@ export default function Sidebar({ user, onLogout, userRole = 'admin', testMode =
       name: 'Assurance',
       icon: '🛡️',
       href: '#',
-      isActive: pathname.startsWith('/dashboard/insurance'),
+      isActive: pathname.startsWith('/dashboard/insurance') || pathname.startsWith('/dashboard/quotes') || pathname.startsWith('/dashboard/contracts'),
       hasSubmenu: true,
       show: permissions.showInsurance,
       subItems: [
+        { id: 'devis', name: 'Devis', icon: '📋', href: '/dashboard/quotes' },
+        { id: 'contrats', name: 'Contrats', icon: '📄', href: '/dashboard/contracts' },
         { id: 'vehicules', name: 'Véhicules', icon: '🚗', href: '/dashboard/insurance/vehicles' },
         { id: 'conducteurs', name: 'Conducteurs', icon: '👨‍💼', href: '/dashboard/insurance/drivers' },
         { id: 'sinistres', name: 'Sinistres', icon: '⚠️', href: '/dashboard/insurance/claims' },
+        { id: 'bancaire', name: 'Coordonnées bancaires', icon: '🏦', href: '/dashboard/insurance/bank-details' },
         { id: 'periodes', name: 'Périodes', icon: '📅', href: '/dashboard/insurance/periods' }
       ]
     },

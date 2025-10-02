@@ -18,7 +18,20 @@ import {
   ChevronRight,
   Plus,
   Search,
-  Filter
+  Filter,
+  Bot,
+  Car,
+  UserCheck,
+  AlertTriangle,
+  Landmark,
+  Clock,
+  PieChart,
+  Download,
+  Globe,
+  MessageCircle,
+  Video,
+  ShoppingBag,
+  Zap
 } from 'lucide-react';
 
 interface MenuItem {
@@ -39,6 +52,12 @@ const menuItems: MenuItem[] = [
     href: '/dashboard'
   },
   {
+    id: 'ai-suggestions',
+    label: 'Suggestions IA',
+    icon: Bot,
+    href: '/dashboard/ai-suggestions'
+  },
+  {
     id: 'users',
     label: 'Utilisateurs',
     icon: Users,
@@ -55,7 +74,8 @@ const menuItems: MenuItem[] = [
     icon: Building,
     children: [
       { id: 'interlocutors-list', label: 'Liste des interlocuteurs', icon: Building, href: '/dashboard/interlocutors' },
-      { id: 'interlocutors-create', label: 'Nouvel interlocuteur', icon: Plus, href: '/dashboard/interlocutors/new' }
+      { id: 'interlocutors-create', label: 'Nouvel interlocuteur', icon: Plus, href: '/dashboard/interlocutors/new' },
+      { id: 'interlocutors-complete', label: 'Création complète', icon: UserCheck, href: '/dashboard/interlocutors/create-complete' }
     ]
   },
   {
@@ -66,6 +86,15 @@ const menuItems: MenuItem[] = [
       { id: 'modules-list', label: 'Tous les modules', icon: FileText, href: '/dashboard/modules' },
       { id: 'modules-create', label: 'Créer un module', icon: Plus, href: '/dashboard/modules/new' },
       { id: 'modules-types', label: 'Types de modules', icon: Settings, href: '/dashboard/modules/types' }
+    ]
+  },
+  {
+    id: 'portfolio',
+    label: 'Portefeuille',
+    icon: FileText,
+    children: [
+      { id: 'quotes', label: 'Devis', icon: FileText, href: '/dashboard/quotes' },
+      { id: 'contracts', label: 'Contrats', icon: Shield, href: '/dashboard/contracts' }
     ]
   },
   {
@@ -82,11 +111,11 @@ const menuItems: MenuItem[] = [
   {
     id: 'statistics',
     label: 'Statistiques',
-    icon: BarChart3,
+    icon: PieChart,
     children: [
       { id: 'stats-overview', label: 'Vue d\'ensemble', icon: BarChart3, href: '/dashboard/statistics' },
       { id: 'stats-reports', label: 'Rapports', icon: FileText, href: '/dashboard/statistics/reports' },
-      { id: 'stats-export', label: 'Exports', icon: TrendingUp, href: '/dashboard/statistics/export' }
+      { id: 'stats-export', label: 'Exports', icon: Download, href: '/dashboard/statistics/export' }
     ]
   },
   {
@@ -100,10 +129,46 @@ const menuItems: MenuItem[] = [
     label: 'Assurance',
     icon: Shield,
     children: [
-      { id: 'insurance-claims', label: 'Antécédents', icon: FileText, href: '/dashboard/insurance/claims' },
-      { id: 'insurance-periods', label: 'Périodes', icon: Calendar, href: '/dashboard/insurance/periods' },
-      { id: 'insurance-drivers', label: 'Chauffeurs', icon: Users, href: '/dashboard/insurance/drivers' },
-      { id: 'insurance-vehicles', label: 'Véhicules', icon: Building, href: '/dashboard/insurance/vehicles' }
+      { id: 'insurance-quotes', label: 'Devis', icon: FileText, href: '/dashboard/quotes' },
+      { id: 'insurance-contracts', label: 'Contrats', icon: Shield, href: '/dashboard/contracts' },
+      { id: 'insurance-claims', label: 'Sinistres', icon: AlertTriangle, href: '/dashboard/insurance/claims' },
+      { id: 'insurance-periods', label: 'Périodes', icon: Clock, href: '/dashboard/insurance/periods' },
+      { id: 'insurance-drivers', label: 'Conducteurs', icon: UserCheck, href: '/dashboard/insurance/drivers' },
+      { id: 'insurance-vehicles', label: 'Véhicules', icon: Car, href: '/dashboard/insurance/vehicles' },
+      { id: 'insurance-bank-details', label: 'Coordonnées bancaires', icon: Landmark, href: '/dashboard/insurance/bank-details' },
+      { id: 'insurance-partners', label: 'Partenaires', icon: Building, href: '/dashboard/insurance/partners' }
+    ]
+  },
+  {
+    id: 'external',
+    label: 'Externe',
+    icon: Globe,
+    children: [
+      { id: 'external-overview', label: 'Vue d\'ensemble', icon: Globe, href: '/dashboard/external' },
+      { id: 'external-profile', label: 'Profil', icon: Users, href: '/dashboard/external/profile' },
+      { id: 'external-search', label: 'Recherche', icon: Search, href: '/dashboard/external/search' },
+      { id: 'external-simulate', label: 'Simulation', icon: BarChart3, href: '/dashboard/external/simulate' }
+    ]
+  },
+  {
+    id: 'test',
+    label: 'Test',
+    icon: Settings,
+    href: '/dashboard/test'
+  },
+  {
+    id: 'social-hub',
+    label: 'Hub Social',
+    icon: Globe,
+    children: [
+      { id: 'social-main', label: 'Hub Principal', icon: Zap, href: '/external/social/hub' },
+      { id: 'social-communities', label: 'Communautés', icon: MessageCircle, href: '/external/social' },
+      { id: 'social-pro', label: 'Communauté Pro', icon: Car, href: '/external/social/hub/groups/VTC-Taxi' },
+      { id: 'social-live', label: 'Live Streaming', icon: Video, href: '/external/social/hub#live' },
+      { id: 'social-marketplace', label: 'Marketplace', icon: ShoppingBag, href: '/external/social/hub#marketplace' },
+      { id: 'social-agency', label: 'Agence Créateurs', icon: Star, href: '/external/social/hub#agency' },
+      { id: 'social-groups', label: 'Groupes Privés', icon: Users, href: '/external/social/hub#groups' },
+      { id: 'social-deals', label: 'Bons Plans', icon: Zap, href: '/external/social/hub#deals' }
     ]
   },
   {
@@ -113,7 +178,8 @@ const menuItems: MenuItem[] = [
     children: [
       { id: 'settings-general', label: 'Général', icon: Settings, href: '/dashboard/settings' },
       { id: 'settings-sites', label: 'Sites', icon: Building, href: '/dashboard/settings/sites' },
-      { id: 'settings-modules', label: 'Modules', icon: FileText, href: '/dashboard/settings/modules' }
+      { id: 'settings-modules', label: 'Modules', icon: FileText, href: '/dashboard/settings/modules' },
+      { id: 'settings-external-content', label: 'Contenu Externe', icon: Globe, href: '/dashboard/settings/external-content' }
     ],
     requiredRank: 0
   }

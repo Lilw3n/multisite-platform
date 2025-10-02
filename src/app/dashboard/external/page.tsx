@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ExternalUserLayout from '@/components/layout/ExternalUserLayout';
+import RoleProtectedRoute from '@/components/auth/RoleProtectedRoute';
 
 interface Interlocutor {
   id: string;

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ModeManager from '@/components/layout/ModeManager';
 import MobileDashboard from '@/components/mobile/MobileDashboard';
+import IntelligentAlertsPanel from '@/components/alerts/IntelligentAlertsPanel';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<{ email: string; name: string } | null>(null);
@@ -221,6 +222,11 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Panneau d'alertes intelligentes */}
+              <div className="mb-8">
+                <IntelligentAlertsPanel showAll={true} maxItems={5} />
               </div>
 
               {/* Quick Actions */}

@@ -10,7 +10,13 @@ DiddyHome est une plateforme multisite connectée révolutionnaire avec un écos
 
 ### 🧠 Système d'Événements Intelligent Unifié
 - **Double Système**: Événements Classiques + Timeline Intelligente IA
-- **Filtres Avancés**: Recherche textuelle, type, statut, priorité, date
+- **🔍 Recherche Intelligente**: Temps réel dans titre, description, créateur, participants
+- **📊 Filtres Avancés Combinables**: 
+  - Type (Appels/Emails/Réunions/Tâches/Notes)
+  - Statut (En attente/Terminé/Annulé)
+  - Priorité (Élevée/Moyenne/Faible)
+  - Date (Aujourd'hui/Hier/Semaine/Mois)
+- **🎯 Interface Moderne**: Compteur dynamique, bouton reset, message vide
 - **Actions Complètes**: Lier, Délier, Modifier, Supprimer avec confirmations
 - **Synchronisation**: Bidirectionnelle entre systèmes
 - **Analytics**: Métriques engagement, sentiment, opportunités
@@ -282,10 +288,13 @@ DiddyHome est une plateforme multisite connectée révolutionnaire avec un écos
 - **Liste Unifiée**: `http://localhost:3008/dashboard/interlocutors`
 - **Filtres Avancés**: Tous/Utilisateurs/Externes avec recherche textuelle
 - **Création Multi-Source**: Dashboard + Externe/Register synchronisés
-- **Système d'Événements Dual**:
+- **Système d'Événements Dual Révolutionnaire**:
   - **📝 Événements Classiques**: Système original avec formulaires complets
+    - **🔍 Recherche Temps Réel**: Dans titre, description, créateur, participants
+    - **📊 4 Filtres Combinables**: Type, Statut, Priorité, Date
+    - **🎯 Interface Moderne**: Compteur dynamique, reset intelligent
+    - **💬 UX Parfaite**: Message vide, suggestions, transitions fluides
   - **🧠 Timeline Intelligente**: Analytics, sentiment, métriques avancées
-  - **Filtres Événements**: Recherche, type, statut, priorité, date
   - **Actions Complètes**: Lier, Délier, Modifier, Supprimer avec confirmations
 
 ### Gestion Financière
@@ -417,10 +426,14 @@ DiddyHome est une plateforme multisite connectée révolutionnaire avec un écos
 4. **Utilisez**: Sélecteurs véhicules (plaque) et entreprises (SIRET)
 5. **Analysez**: Éligibilité temps réel et recommandations IA
 
-### 📊 Pour Gérer les Événements:
+### 📊 Pour Gérer les Événements (Système Dual):
 1. **Allez sur**: `http://localhost:3008/dashboard/interlocutors/1`
-2. **Utilisez**: Système dual (Classique + IA Timeline)
-3. **Filtrez**: Par recherche, type, statut, priorité, date
+2. **Section Événements Classiques**:
+   - **🔍 Recherchez**: Tapez dans la barre (temps réel)
+   - **📊 Filtrez**: 4 filtres combinables (Type/Statut/Priorité/Date)
+   - **📈 Compteur**: Voir nombre d'événements filtrés
+   - **🔄 Reset**: Bouton pour réinitialiser tous filtres
+3. **Section Timeline IA**: Analytics avancées et métriques
 4. **Actions**: Lier, Délier, Modifier, Supprimer avec confirmations
 5. **Créez**: Bouton + Ajouter → Formulaire complet
 
@@ -442,6 +455,9 @@ DiddyHome est une plateforme multisite connectée révolutionnaire avec un écos
 
 ### ✅ **SYSTÈMES UNIFIÉS**:
 - 🧠 **Événements Dual**: Classique + IA Timeline coexistent
+  - **🔍 Recherche Temps Réel**: Dans tous champs événements
+  - **📊 4 Filtres Combinables**: Type, Statut, Priorité, Date
+  - **🎯 Interface Moderne**: Compteur, reset, UX parfaite
 - 👥 **Interlocuteurs Multi-Source**: Dashboard + Externe synchronisés
 - 🤖 **Triple Assistants**: IA + Classique + Simple pour devis
 - 🔄 **Synchronisation**: Bidirectionnelle parfaite entre tous systèmes

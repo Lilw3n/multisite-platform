@@ -162,6 +162,23 @@ DiddyHome est une plateforme multisite connectée avec un écosystème social co
   - Auto-suppression des messages
   - Chiffrement de bout en bout
 
+### Système de Bons Plans
+- **URL**: `http://localhost:3008/external/social/hub#deals`
+- **Description**: Plateforme de bons plans avec rémunération personnalisable
+- **Concept**: "Roi des bons plans" - économisez 400€ sur un vol à 1000€
+- **Fonctionnalités**:
+  - Création de deals avec rémunération fixe ou pourcentage
+  - Commission automatique DiddyHome (8-12% des gains finder)
+  - Système de demandes de bons plans
+  - Négociation et contre-offres
+  - Validation et preuves requises
+  - Classement des finders par succès
+  - Catégories: Voyage, Transport, Immobilier, Shopping, Services
+- **Rémunération**:
+  - Finder: 15€-50€ fixe ou 8-40% des économies
+  - Commission DiddyHome: Automatique sur toutes transactions
+  - Exemple: Vol 1000€→600€, Finder gagne 45€ net (50€-5€ commission)
+
 ### Marketplace Sociale
 - **Intégré dans**: Hub Social
 - **Fonctionnalités**:

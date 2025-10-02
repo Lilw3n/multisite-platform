@@ -60,6 +60,8 @@ export default function InterlocutorDetailPage() {
   const [eventStatusFilter, setEventStatusFilter] = useState<string>('all');
   const [eventPriorityFilter, setEventPriorityFilter] = useState<string>('all');
   const [eventDateFilter, setEventDateFilter] = useState<string>('all');
+  const [eventSortBy, setEventSortBy] = useState<string>('event_date'); // 'event_date' ou 'creation_date'
+  const [eventSortOrder, setEventSortOrder] = useState<string>('desc'); // 'asc' ou 'desc'
   
   // États pour les formulaires de modification
   const [showClaimEditForm, setShowClaimEditForm] = useState(false);
@@ -550,54 +552,77 @@ export default function InterlocutorDetailPage() {
     }
   };
 
-  // Fonction pour filtrer les événements
-  const filteredEvents = interlocutor?.events.filter(event => {
-    // Filtre par recherche textuelle
-    const matchesSearch = eventSearchQuery === '' || 
-      event.title.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
-      event.description.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
-      event.createdBy.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
-      event.participants.some(p => p.name.toLowerCase().includes(eventSearchQuery.toLowerCase()));
+  // Fonction pour filtrer et trier les événements
+  const filteredEvents = (() => {
+    if (!interlocutor?.events) return [];
 
-    // Filtre par type
-    const matchesType = eventTypeFilter === 'all' || event.type === eventTypeFilter;
+    // D'abord filtrer
+    const filtered = interlocutor.events.filter(event => {
+      // Filtre par recherche textuelle
+      const matchesSearch = eventSearchQuery === '' || 
+        event.title.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
+        event.description.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
+        event.createdBy.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
+        event.participants.some(p => p.name.toLowerCase().includes(eventSearchQuery.toLowerCase()));
 
-    // Filtre par statut
-    const matchesStatus = eventStatusFilter === 'all' || event.status === eventStatusFilter;
+      // Filtre par type
+      const matchesType = eventTypeFilter === 'all' || event.type === eventTypeFilter;
 
-    // Filtre par priorité
-    const matchesPriority = eventPriorityFilter === 'all' || event.priority === eventPriorityFilter;
+      // Filtre par statut
+      const matchesStatus = eventStatusFilter === 'all' || event.status === eventStatusFilter;
 
-    // Filtre par date
-    const matchesDate = (() => {
-      if (eventDateFilter === 'all') return true;
-      
-      const eventDate = new Date(event.date);
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      const thisWeek = new Date(today);
-      thisWeek.setDate(thisWeek.getDate() - 7);
-      const thisMonth = new Date(today);
-      thisMonth.setMonth(thisMonth.getMonth() - 1);
+      // Filtre par priorité
+      const matchesPriority = eventPriorityFilter === 'all' || event.priority === eventPriorityFilter;
 
-      switch (eventDateFilter) {
-        case 'today':
-          return eventDate >= today;
-        case 'yesterday':
-          return eventDate >= yesterday && eventDate < today;
-        case 'week':
-          return eventDate >= thisWeek;
-        case 'month':
-          return eventDate >= thisMonth;
-        default:
-          return true;
+      // Filtre par date
+      const matchesDate = (() => {
+        if (eventDateFilter === 'all') return true;
+        
+        const eventDate = new Date(event.date);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const thisWeek = new Date(today);
+        thisWeek.setDate(thisWeek.getDate() - 7);
+        const thisMonth = new Date(today);
+        thisMonth.setMonth(thisMonth.getMonth() - 1);
+
+        switch (eventDateFilter) {
+          case 'today':
+            return eventDate >= today;
+          case 'yesterday':
+            return eventDate >= yesterday && eventDate < today;
+          case 'week':
+            return eventDate >= thisWeek;
+          case 'month':
+            return eventDate >= thisMonth;
+          default:
+            return true;
+        }
+      })();
+
+      return matchesSearch && matchesType && matchesStatus && matchesPriority && matchesDate;
+    });
+
+    // Ensuite trier
+    return filtered.sort((a, b) => {
+      let dateA: Date, dateB: Date;
+
+      if (eventSortBy === 'event_date') {
+        // Trier par date de l'événement (date choisie par le créateur)
+        dateA = new Date(`${a.date} ${a.time || '00:00'}`);
+        dateB = new Date(`${b.date} ${b.time || '00:00'}`);
+      } else {
+        // Trier par date de création
+        dateA = new Date(a.createdAt);
+        dateB = new Date(b.createdAt);
       }
-    })();
 
-    return matchesSearch && matchesType && matchesStatus && matchesPriority && matchesDate;
-  }) || [];
+      const comparison = dateA.getTime() - dateB.getTime();
+      return eventSortOrder === 'asc' ? comparison : -comparison;
+    });
+  })();
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -1073,8 +1098,36 @@ export default function InterlocutorDetailPage() {
                               </select>
                             </div>
                             
+                            {/* Contrôles de tri */}
+                            <div className="border-t pt-3 mt-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-medium text-gray-600">📊 Tri des événements :</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                {/* Trier par */}
+                                <select
+                                  value={eventSortBy}
+                                  onChange={(e) => setEventSortBy(e.target.value)}
+                                  className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500"
+                                >
+                                  <option value="event_date">📅 Date événement (choisie)</option>
+                                  <option value="creation_date">✏️ Date création</option>
+                                </select>
+                                
+                                {/* Ordre */}
+                                <select
+                                  value={eventSortOrder}
+                                  onChange={(e) => setEventSortOrder(e.target.value)}
+                                  className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500"
+                                >
+                                  <option value="desc">⬇️ Plus récent d'abord</option>
+                                  <option value="asc">⬆️ Plus ancien d'abord</option>
+                                </select>
+                              </div>
+                            </div>
+                            
                             {/* Bouton reset filtres */}
-                            {(eventSearchQuery || eventTypeFilter !== 'all' || eventStatusFilter !== 'all' || eventPriorityFilter !== 'all' || eventDateFilter !== 'all') && (
+                            {(eventSearchQuery || eventTypeFilter !== 'all' || eventStatusFilter !== 'all' || eventPriorityFilter !== 'all' || eventDateFilter !== 'all' || eventSortBy !== 'event_date' || eventSortOrder !== 'desc') && (
                               <div className="flex justify-end">
                                 <button
                                   onClick={() => {
@@ -1083,10 +1136,12 @@ export default function InterlocutorDetailPage() {
                                     setEventStatusFilter('all');
                                     setEventPriorityFilter('all');
                                     setEventDateFilter('all');
+                                    setEventSortBy('event_date');
+                                    setEventSortOrder('desc');
                                   }}
                                   className="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded transition-colors"
                                 >
-                                  🔄 Réinitialiser filtres
+                                  🔄 Réinitialiser filtres et tri
                                 </button>
                               </div>
                             )}

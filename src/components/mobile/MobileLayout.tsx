@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import MobileNotifications from './MobileNotifications';
+import { NotificationService } from '@/lib/notificationService';
 import { 
   Home, 
   Users, 
@@ -33,7 +35,8 @@ interface MobileLayoutProps {
 export default function MobileLayout({ children }: MobileLayoutProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [notifications, setNotifications] = useState(3);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -43,7 +46,26 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    
+    // Charger le nombre de notifications non lues
+    const updateUnreadCount = () => {
+      const unread = NotificationService.getUnreadNotifications();
+      setUnreadCount(unread.length);
+    };
+    
+    updateUnreadCount();
+    
+    // Écouter les nouvelles notifications
+    window.addEventListener('newNotification', updateUnreadCount);
+    window.addEventListener('notificationRead', updateUnreadCount);
+    window.addEventListener('allNotificationsRead', updateUnreadCount);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('newNotification', updateUnreadCount);
+      window.removeEventListener('notificationRead', updateUnreadCount);
+      window.removeEventListener('allNotificationsRead', updateUnreadCount);
+    };
   }, []);
 
   // Navigation principale mobile
@@ -157,11 +179,14 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
             <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <Search className="h-5 w-5 text-gray-600" />
             </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
+            <button 
+              onClick={() => setShowNotifications(true)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
+            >
               <Bell className="h-5 w-5 text-gray-600" />
-              {notifications > 0 && (
+              {unreadCount > 0 && (
                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {notifications}
+                  {unreadCount > 99 ? '99+' : unreadCount}
                 </div>
               )}
             </button>
@@ -276,6 +301,12 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
       >
         <Camera className="h-6 w-6 text-white" />
       </Link>
+
+      {/* Notifications Modal */}
+      <MobileNotifications
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
 
       {/* Quick Stats Bar (optionnel, pour engagement) */}
       <div className="fixed top-16 left-0 right-0 z-40 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 text-sm">

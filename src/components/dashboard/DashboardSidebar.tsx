@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Plus,
   Search,
+  Star,
   Filter,
   Bot,
   Car,

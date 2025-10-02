@@ -13,6 +13,7 @@ import ModuleUnlinkManager from '@/components/ModuleUnlinkManager';
 import EventForm from '@/components/EventForm';
 import ModuleAddForm from '@/components/ModuleAddForm';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
+import SmartEventsTimeline from '@/components/events/SmartEventsTimeline';
 import EligibilityChecker from '@/components/EligibilityChecker';
 import CompanyForm from '@/components/CompanyForm';
 import FamilyForm from '@/components/FamilyForm';
@@ -940,7 +941,16 @@ export default function InterlocutorDetailPage() {
                         </button>
                       </div>
                       <div className="p-2 max-h-[70vh] overflow-y-auto">
-                        <div className="space-y-2">
+                        {/* Timeline intelligente des événements */}
+                        <SmartEventsTimeline 
+                          interlocutorId={interlocutor.id}
+                          showAnalytics={false}
+                          maxEvents={20}
+                          autoRefresh={true}
+                        />
+                        
+                        {/* Ancienne liste d'événements (fallback) */}
+                        <div className="space-y-2 mt-4">
                           {interlocutor.events.map((event) => (
                             <div key={event.id} className="border border-gray-200 rounded-lg p-2 hover:shadow-md transition-shadow bg-gradient-to-r from-gray-50 to-white">
                               <div className="flex items-start space-x-2">

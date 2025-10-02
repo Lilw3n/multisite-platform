@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { IntelligentQuoteService } from '@/lib/intelligentQuoteService';
+import InterlocutorSelector from '@/components/InterlocutorSelector';
 import { 
   IntelligentQuoteSession, 
   QuestionnaireStep, 
@@ -50,6 +51,7 @@ export default function IntelligentQuoteWizard({
   const [recommendations, setRecommendations] = useState<AIRecommendation[]>([]);
   const [eligibilityScore, setEligibilityScore] = useState<number>(0);
   const [showAIInsights, setShowAIInsights] = useState(false);
+  const [selectedInterlocutor, setSelectedInterlocutor] = useState<any>(null);
 
   useEffect(() => {
     initializeSession();
@@ -74,16 +76,21 @@ export default function IntelligentQuoteWizard({
       const existing = IntelligentQuoteService.getSession(sessionId);
       if (existing) {
         currentSession = existing;
-        // Charger les réponses existantes
+        // Charger les réponses existantes et l'interlocuteur
         const existingAnswers: Record<string, any> = {};
-        // Extraire les réponses des données de session
-        // TODO: Implémenter l'extraction des réponses
+        // Extraire les données de l'interlocuteur si disponibles
+        if (existing.sessionData.interlocutor.personalInfo.firstName) {
+          existingAnswers.first_name = existing.sessionData.interlocutor.personalInfo.firstName;
+          existingAnswers.last_name = existing.sessionData.interlocutor.personalInfo.lastName;
+          existingAnswers.email = existing.sessionData.interlocutor.personalInfo.email;
+          existingAnswers.phone = existing.sessionData.interlocutor.personalInfo.phone;
+        }
         setAnswers(existingAnswers);
       } else {
         currentSession = IntelligentQuoteService.createSession(interlocutorId);
       }
     } else {
-      currentSession = IntelligentQuoteService.createSession(interlocutorId);
+      currentSession = IntelligentQuoteService.createSession(interlocutorId || selectedInterlocutor?.id);
     }
     
     setSession(currentSession);
@@ -193,6 +200,13 @@ export default function IntelligentQuoteWizard({
     
     const currentStep = steps[currentStepIndex];
     const stepErrors: Record<string, string> = {};
+    
+    // Validation spéciale pour l'étape interlocuteur
+    if (currentStepIndex === 0 && currentStep.id === 'interlocutor_basic') {
+      if (!selectedInterlocutor && (!answers.first_name || !answers.last_name || !answers.email)) {
+        stepErrors['interlocutor'] = 'Veuillez sélectionner un interlocuteur existant ou remplir les informations de base';
+      }
+    }
     
     currentStep.questions.forEach(question => {
       if (question.required && !answers[question.id]) {
@@ -582,6 +596,46 @@ export default function IntelligentQuoteWizard({
           </div>
 
           <div className="space-y-6">
+            {/* Sélection d'interlocuteur pour la première étape */}
+            {currentStepIndex === 0 && currentStep.id === 'interlocutor_basic' && (
+              <div className="space-y-2 mb-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Client / Interlocuteur *
+                </label>
+                <InterlocutorSelector
+                  selectedInterlocutor={selectedInterlocutor}
+                  onSelect={(interlocutor) => {
+                    setSelectedInterlocutor(interlocutor);
+                    // Pré-remplir les champs avec les données de l'interlocuteur
+                    const newAnswers = {
+                      ...answers,
+                      first_name: interlocutor.contactPerson?.split(' ')[0] || '',
+                      last_name: interlocutor.contactPerson?.split(' ').slice(1).join(' ') || '',
+                      email: interlocutor.email || '',
+                      phone: interlocutor.phone || ''
+                    };
+                    setAnswers(newAnswers);
+                  }}
+                  onClear={() => {
+                    setSelectedInterlocutor(null);
+                    // Vider les champs pré-remplis
+                    const newAnswers = { ...answers };
+                    delete newAnswers.first_name;
+                    delete newAnswers.last_name;
+                    delete newAnswers.email;
+                    delete newAnswers.phone;
+                    setAnswers(newAnswers);
+                  }}
+                  placeholder="Rechercher un client existant ou créer un nouveau..."
+                  required={true}
+                  userRole="admin"
+                />
+                {errors['interlocutor'] && (
+                  <p className="text-sm text-red-600">{errors['interlocutor']}</p>
+                )}
+              </div>
+            )}
+            
             {currentStep.questions.map(question => renderQuestion(question))}
           </div>
         </div>

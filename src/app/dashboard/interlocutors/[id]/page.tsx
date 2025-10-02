@@ -54,6 +54,13 @@ export default function InterlocutorDetailPage() {
   const [company, setCompany] = useState<Company | null>(null);
   const [family, setFamily] = useState<Family | null>(null);
   
+  // États pour les filtres d'événements
+  const [eventSearchQuery, setEventSearchQuery] = useState('');
+  const [eventTypeFilter, setEventTypeFilter] = useState<string>('all');
+  const [eventStatusFilter, setEventStatusFilter] = useState<string>('all');
+  const [eventPriorityFilter, setEventPriorityFilter] = useState<string>('all');
+  const [eventDateFilter, setEventDateFilter] = useState<string>('all');
+  
   // États pour les formulaires de modification
   const [showClaimEditForm, setShowClaimEditForm] = useState(false);
   const [showVehicleEditForm, setShowVehicleEditForm] = useState(false);
@@ -542,6 +549,55 @@ export default function InterlocutorDetailPage() {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Fonction pour filtrer les événements
+  const filteredEvents = interlocutor?.events.filter(event => {
+    // Filtre par recherche textuelle
+    const matchesSearch = eventSearchQuery === '' || 
+      event.title.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
+      event.description.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
+      event.createdBy.toLowerCase().includes(eventSearchQuery.toLowerCase()) ||
+      event.participants.some(p => p.name.toLowerCase().includes(eventSearchQuery.toLowerCase()));
+
+    // Filtre par type
+    const matchesType = eventTypeFilter === 'all' || event.type === eventTypeFilter;
+
+    // Filtre par statut
+    const matchesStatus = eventStatusFilter === 'all' || event.status === eventStatusFilter;
+
+    // Filtre par priorité
+    const matchesPriority = eventPriorityFilter === 'all' || event.priority === eventPriorityFilter;
+
+    // Filtre par date
+    const matchesDate = (() => {
+      if (eventDateFilter === 'all') return true;
+      
+      const eventDate = new Date(event.date);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const thisWeek = new Date(today);
+      thisWeek.setDate(thisWeek.getDate() - 7);
+      const thisMonth = new Date(today);
+      thisMonth.setMonth(thisMonth.getMonth() - 1);
+
+      switch (eventDateFilter) {
+        case 'today':
+          return eventDate >= today;
+        case 'yesterday':
+          return eventDate >= yesterday && eventDate < today;
+        case 'week':
+          return eventDate >= thisWeek;
+        case 'month':
+          return eventDate >= thisMonth;
+        default:
+          return true;
+      }
+    })();
+
+    return matchesSearch && matchesType && matchesStatus && matchesPriority && matchesDate;
+  }) || [];
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {

@@ -1,8 +1,39 @@
-# 🌐 Guide de Navigation Sociale - DiddyHome
+# 🌐 Guide Complet DiddyHome - Plateforme Multisite Intelligente
 
 ## 📋 Vue d'ensemble
 
-DiddyHome est une plateforme multisite connectée avec un écosystème social complet. Ce guide répertorie tous les liens et chemins d'accès aux différentes fonctionnalités sociales et communautaires.
+DiddyHome est une plateforme multisite connectée révolutionnaire avec un écosystème social complet, des systèmes d'événements intelligents, des assistants IA pour devis/contrats, et une gestion avancée des interlocuteurs. Cette plateforme combine le meilleur des réseaux sociaux, de la gestion d'assurance professionnelle, et de l'intelligence artificielle.
+
+---
+
+## 🎯 NOUVEAUTÉS RÉVOLUTIONNAIRES 2025
+
+### 🧠 Système d'Événements Intelligent Unifié
+- **Double Système**: Événements Classiques + Timeline Intelligente IA
+- **Filtres Avancés**: Recherche textuelle, type, statut, priorité, date
+- **Actions Complètes**: Lier, Délier, Modifier, Supprimer avec confirmations
+- **Synchronisation**: Bidirectionnelle entre systèmes
+- **Analytics**: Métriques engagement, sentiment, opportunités
+
+### 🤖 Assistants IA pour Devis/Contrats
+- **Assistant IA Intelligent**: Questionnaire adaptatif avec analyse d'éligibilité temps réel
+- **Assistant Classique**: Workflow traditionnel avec sélecteurs avancés
+- **Devis Simple**: Création rapide avec interlocuteurs existants
+- **Sélecteurs Véhicules**: Reconnaissance plaque (FR/étranger/WW), SRA, GTA, Argus
+- **Sélecteurs Entreprises**: Recherche SIRET/SIREN, validation, liens interlocuteurs
+
+### 📊 Gestion Interlocuteurs Révolutionnaire
+- **Création Unifiée**: Depuis externe/register → visible dashboard
+- **Filtres Intelligents**: Tous/Utilisateurs/Externes avec recherche
+- **Événements Dual**: Système classique + Timeline IA coexistent
+- **Modules Complets**: Véhicules, Sinistres, Contrats, Famille, Entreprise
+- **Liaison Automatique**: Entre modules et événements
+
+### 🚀 Streaming Professionnel Sécurisé
+- **RTMP/WebRTC**: Connexion OBS sécurisée avec clés uniques
+- **Mobile Streaming**: Direct depuis téléphone avec interface dédiée
+- **Analytics Live**: Métriques temps réel, audience, engagement
+- **Multi-Plateforme**: Desktop + Mobile optimisé
 
 ---
 
@@ -53,15 +84,15 @@ DiddyHome est une plateforme multisite connectée avec un écosystème social co
 ## 👥 Groupes Spécialisés
 
 ### Communauté Professionnelle
-- **URL**: `http://localhost:3008/external/social/hub/groups/VTC-Taxi`
-- **Description**: Communauté dédiée aux professionnels connectés
+- **URL**: `http://localhost:3008/external/social/hub`
+- **Description**: Hub social principal pour tous les professionnels
 - **Membres**: 12,847+ professionnels
 - **Fonctionnalités**:
-  - Feed spécialisé professionnel
-  - Événements sectoriels
-  - Deals et promotions
-  - Live streams métier
-  - Système de parrainage
+  - Feed social en temps réel
+  - Marketplace intégrée
+  - Live streaming professionnel
+  - Économie des créateurs
+  - Système de matching
 
 ### Assurance Professionnelle
 - **URL**: `http://localhost:3008/external/social/hub/groups/Assurance-Pro`
@@ -129,15 +160,20 @@ DiddyHome est une plateforme multisite connectée avec un écosystème social co
 
 ---
 
-## 📱 Fonctionnalités Sociales Avancées
+## 📱 Fonctionnalités Sociales Révolutionnaires
 
-### Live Streaming
-- **Intégré dans**: Hub Social et groupes spécialisés
-- **Fonctionnalités**:
-  - Streaming en direct
-  - Chat en temps réel
-  - Système de dons/tips
-  - Classements des streamers
+### 🚀 Live Streaming Professionnel Sécurisé
+- **Hub Principal**: `http://localhost:3008/external/social/hub`
+- **Mobile Streaming**: `http://localhost:3008/external/social/hub/live/mobile`
+- **Fonctionnalités Avancées**:
+  - **RTMP/WebRTC**: Connexion OBS sécurisée avec clés uniques
+  - **Mobile Direct**: Streaming depuis téléphone avec interface dédiée
+  - **Analytics Live**: Métriques temps réel, audience, engagement
+  - **Chat Temps Réel**: Interaction audience avec modération
+  - **Système Dons/Tips**: Monétisation intégrée
+  - **Classements**: Streamers par popularité et engagement
+  - **Multi-Plateforme**: Desktop + Mobile optimisé
+  - **Sécurité**: Clés RTMP rotatives, chiffrement bout-en-bout
 
 ### Agence Créateurs
 - **URL**: `http://localhost:3008/external/social/hub#agency`
@@ -223,15 +259,34 @@ DiddyHome est une plateforme multisite connectée avec un écosystème social co
 
 ---
 
-## 🔧 Outils de Gestion
+## 🔧 Outils de Gestion Révolutionnaires
 
-### Devis et Contrats
-- **Devis**: `http://localhost:3008/dashboard/quotes`
-- **Contrats**: `http://localhost:3008/dashboard/contracts`
-- **Fonctionnalités**:
-  - Assistant de création
-  - Sélection d'interlocuteurs existants
-  - Création d'interlocuteurs à la volée
+### 🤖 Système de Devis/Contrats IA
+- **Devis Intelligents**: `http://localhost:3008/dashboard/quotes`
+- **Contrats Avancés**: `http://localhost:3008/dashboard/contracts`
+- **Triple Assistant**:
+  - **🧠 Assistant IA**: Questionnaire adaptatif avec analyse d'éligibilité temps réel
+  - **🧙‍♂️ Assistant Classique**: Workflow traditionnel avec sélecteurs avancés  
+  - **⚡ Devis Simple**: Création rapide avec interlocuteurs existants
+- **Sélecteurs Intelligents**:
+  - **🚗 Véhicules**: Reconnaissance plaque FR/étranger/WW, SRA, GTA, Argus automatique
+  - **🏢 Entreprises**: Recherche SIRET/SIREN, validation, liens interlocuteurs
+  - **👥 Interlocuteurs**: Sélection existants ou création à la volée
+- **Analyse Temps Réel**:
+  - Éligibilité automatique selon critères assureurs
+  - Recommandations IA personnalisées
+  - Score de risque et opportunité
+  - Lead qualification automatique
+
+### 📊 Gestion Interlocuteurs Intelligente
+- **Liste Unifiée**: `http://localhost:3008/dashboard/interlocutors`
+- **Filtres Avancés**: Tous/Utilisateurs/Externes avec recherche textuelle
+- **Création Multi-Source**: Dashboard + Externe/Register synchronisés
+- **Système d'Événements Dual**:
+  - **📝 Événements Classiques**: Système original avec formulaires complets
+  - **🧠 Timeline Intelligente**: Analytics, sentiment, métriques avancées
+  - **Filtres Événements**: Recherche, type, statut, priorité, date
+  - **Actions Complètes**: Lier, Délier, Modifier, Supprimer avec confirmations
 
 ### Gestion Financière
 - **Vue d'ensemble**: `http://localhost:3008/dashboard/financial`
@@ -248,15 +303,39 @@ DiddyHome est une plateforme multisite connectée avec un écosystème social co
 
 ---
 
-## 🚀 Fonctionnalités Avancées
+## 🚀 Fonctionnalités Techniques Avancées
 
-### SEO & Engagement
+### 🧠 Intelligence Artificielle Intégrée
+- **Assistants IA**: Questionnaires adaptatifs pour devis/contrats
+- **Analyse Éligibilité**: Temps réel selon critères assureurs
+- **Recommandations**: Personnalisées par profil client
+- **Lead Scoring**: Qualification automatique des prospects
+- **Analytics Prédictives**: Sentiment, opportunités, risques
+- **Événements Intelligents**: Classification automatique, enrichissement
+
+### 🔄 Systèmes Unifiés et Synchronisés
+- **Double Événements**: Classique + IA coexistent parfaitement
+- **Interlocuteurs Multi-Source**: Dashboard + Externe synchronisés
+- **Sélecteurs Avancés**: Véhicules, Entreprises, Interlocuteurs
+- **Filtres Intelligents**: Recherche textuelle + critères multiples
+- **Actions Bidirectionnelles**: Lier/Délier entre tous modules
+
+### 📱 Mobile-First Design
+- **Responsive Complet**: Toutes pages optimisées mobile
+- **Streaming Mobile**: Interface dédiée téléphone
+- **Navigation Mobile**: Bottom nav + FAB
+- **Notifications Push**: Système natif intégré
+- **Blog Mobile**: Lecture optimisée + mode sombre
+
+### SEO & Engagement Révolutionnaire
 - **Intégré partout**: Optimisation automatique pour le référencement
 - **Fonctionnalités**:
-  - Meta tags dynamiques
-  - Open Graph
-  - Schema.org
-  - Sitemap automatique
+  - Meta tags dynamiques avec IA
+  - Open Graph personnalisé
+  - Schema.org automatique
+  - Sitemap intelligent
+  - Keywords suggestions IA
+  - Content optimization
 
 ### Gamification
 - **Système de points**: Intégré dans toutes les interactions
@@ -329,7 +408,71 @@ DiddyHome est une plateforme multisite connectée avec un écosystème social co
 
 ---
 
-*Dernière mise à jour: Janvier 2025*
-*Version: 1.0*
+## 🎯 GUIDE D'UTILISATION RAPIDE
 
-> 💡 **Astuce**: Utilisez le menu de navigation sociale (icône 🌐) disponible sur toutes les pages pour accéder rapidement à ces fonctionnalités !
+### 🚀 Pour Créer un Devis/Contrat Intelligent:
+1. **Allez sur**: `http://localhost:3008/dashboard/quotes`
+2. **Choisissez**: 🧠 Assistant IA (questionnaire adaptatif) OU 🧙‍♂️ Assistant Classique
+3. **Sélectionnez**: Interlocuteur existant ou créez-en un nouveau
+4. **Utilisez**: Sélecteurs véhicules (plaque) et entreprises (SIRET)
+5. **Analysez**: Éligibilité temps réel et recommandations IA
+
+### 📊 Pour Gérer les Événements:
+1. **Allez sur**: `http://localhost:3008/dashboard/interlocutors/1`
+2. **Utilisez**: Système dual (Classique + IA Timeline)
+3. **Filtrez**: Par recherche, type, statut, priorité, date
+4. **Actions**: Lier, Délier, Modifier, Supprimer avec confirmations
+5. **Créez**: Bouton + Ajouter → Formulaire complet
+
+### 🚀 Pour Streamer:
+1. **Desktop**: `http://localhost:3008/external/social/hub` → Studio
+2. **Mobile**: `http://localhost:3008/external/social/hub/live/mobile`
+3. **Configurez**: Clés RTMP pour OBS ou streaming direct
+4. **Analysez**: Métriques temps réel et engagement
+
+### 👥 Pour Gérer Interlocuteurs:
+1. **Liste**: `http://localhost:3008/dashboard/interlocutors`
+2. **Filtrez**: Tous/Utilisateurs/Externes + recherche
+3. **Créez**: Dashboard OU externe/register (synchronisés)
+4. **Gérez**: Modules complets (véhicules, sinistres, événements)
+
+---
+
+## 🔄 CHANGELOG RÉVOLUTIONNAIRE 2025
+
+### ✅ **SYSTÈMES UNIFIÉS**:
+- 🧠 **Événements Dual**: Classique + IA Timeline coexistent
+- 👥 **Interlocuteurs Multi-Source**: Dashboard + Externe synchronisés
+- 🤖 **Triple Assistants**: IA + Classique + Simple pour devis
+- 🔄 **Synchronisation**: Bidirectionnelle parfaite entre tous systèmes
+
+### ✅ **INTELLIGENCE ARTIFICIELLE**:
+- 🧠 **Questionnaires Adaptatifs**: Analyse éligibilité temps réel
+- 📊 **Analytics Prédictives**: Sentiment, opportunités, risques
+- 🎯 **Lead Scoring**: Qualification automatique prospects
+- 🔍 **Recommandations**: Personnalisées par profil client
+
+### ✅ **SÉLECTEURS AVANCÉS**:
+- 🚗 **Véhicules**: Plaque FR/étranger/WW, SRA, GTA, Argus
+- 🏢 **Entreprises**: SIRET/SIREN, validation, liens
+- 👥 **Interlocuteurs**: Existants ou création à la volée
+
+### ✅ **STREAMING PROFESSIONNEL**:
+- 🚀 **RTMP/WebRTC**: OBS sécurisé + mobile direct
+- 📊 **Analytics Live**: Métriques temps réel
+- 🔒 **Sécurité**: Clés rotatives, chiffrement
+
+### ✅ **MOBILE-FIRST**:
+- 📱 **Responsive Complet**: Toutes pages optimisées
+- 🎯 **Navigation Mobile**: Bottom nav + FAB
+- 📲 **Push Notifications**: Système natif
+- 📖 **Blog Mobile**: Lecture optimisée
+
+---
+
+*Dernière mise à jour: Janvier 2025*
+*Version: 2.0 RÉVOLUTIONNAIRE* 🚀
+
+> 💡 **Astuce**: Cette plateforme combine maintenant IA, streaming professionnel, gestion avancée et social dans un écosystème unifié ! Utilisez le menu de navigation (icône 🌐) pour accéder rapidement à toutes les fonctionnalités !
+
+> 🎯 **Nouveau**: Système d'événements dual, assistants IA pour devis, sélecteurs intelligents, streaming sécurisé, et synchronisation parfaite entre tous les modules !

@@ -18,7 +18,7 @@ import {
   Calendar,
   Tag,
   TrendingUp,
-  Fire,
+  Flame,
   Star,
   ArrowRight
 } from 'lucide-react';
@@ -154,7 +154,7 @@ export default function BlogPage() {
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              <Fire className="h-4 w-4" />
+              <Flame className="h-4 w-4" />
               <span>Tous les articles</span>
             </button>
             

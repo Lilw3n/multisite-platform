@@ -595,15 +595,15 @@ export default function ContractDetailPage() {
                         <div className="space-y-2">
                           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
                             <span className="text-sm font-medium text-gray-700">Coordonnées bancaires</span>
-                            <span className="text-gray-400">></span>
+                            <span className="text-gray-400">&gt;</span>
                           </div>
                           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
                             <span className="text-sm font-medium text-gray-700">Véhicule</span>
-                            <span className="text-gray-400">></span>
+                            <span className="text-gray-400">&gt;</span>
                           </div>
                           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
                             <span className="text-sm font-medium text-gray-700">Profil conducteur</span>
-                            <span className="text-gray-400">></span>
+                            <span className="text-gray-400">&gt;</span>
                           </div>
                         </div>
                       </div>

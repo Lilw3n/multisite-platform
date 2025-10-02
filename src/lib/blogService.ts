@@ -506,14 +506,14 @@ Mes critères de négociateur :
 ## 📊 Calcul de Rentabilité : Ma Feuille de Route
 
 ### Rentabilité Brute
-```
+\`\`\`
 (Loyer annuel / Prix d'achat) × 100
-```
+\`\`\`
 
 ### Rentabilité Nette (plus réaliste)
-```
+\`\`\`
 ((Loyer annuel - Charges - Impôts - Travaux) / Prix total) × 100
-```
+\`\`\`
 
 ### Mon Tableau de Bord Excel
 | Poste | Montant | % du loyer |
@@ -695,5 +695,71 @@ Prévoir 1 mois de vacance par an minimum.
       )
       .sort((a, b) => b.stats.views - a.stats.views)
       .slice(0, limit);
+  }
+
+  // Charger les catégories
+  static getCategories(): BlogCategory[] {
+    return [
+      {
+        id: 'assurance',
+        name: 'Assurance',
+        slug: 'assurance',
+        description: 'Conseils et guides sur l\'assurance',
+        icon: '🛡️',
+        color: 'blue',
+        seo: {
+          title: 'Assurance - Guides et Conseils',
+          description: 'Découvrez nos guides complets sur l\'assurance',
+          keywords: ['assurance', 'protection', 'couverture']
+        },
+        subcategories: [],
+        targetKeywords: ['assurance auto', 'assurance habitation', 'assurance santé']
+      },
+      {
+        id: 'immobilier',
+        name: 'Immobilier',
+        slug: 'immobilier',
+        description: 'Investissement et conseils immobiliers',
+        icon: '🏠',
+        color: 'green',
+        seo: {
+          title: 'Immobilier - Investissement et Conseils',
+          description: 'Guides pour investir dans l\'immobilier',
+          keywords: ['immobilier', 'investissement', 'achat']
+        },
+        subcategories: [],
+        targetKeywords: ['investissement locatif', 'achat immobilier', 'rentabilité']
+      },
+      {
+        id: 'finance',
+        name: 'Finance',
+        slug: 'finance',
+        description: 'Gestion financière et investissements',
+        icon: '💰',
+        color: 'yellow',
+        seo: {
+          title: 'Finance - Gestion et Investissement',
+          description: 'Conseils en gestion financière',
+          keywords: ['finance', 'investissement', 'épargne']
+        },
+        subcategories: [],
+        targetKeywords: ['gestion patrimoine', 'investissement', 'épargne']
+      },
+      {
+        id: 'business',
+        name: 'Business',
+        slug: 'business',
+        description: 'Entrepreneuriat et développement business',
+        icon: '💼',
+        color: 'purple',
+        seo: {
+          title: 'Business - Entrepreneuriat',
+          description: 'Guides pour développer votre business',
+          keywords: ['business', 'entrepreneuriat', 'startup']
+        },
+        subcategories: [],
+        targetKeywords: ['création entreprise', 'développement business', 'stratégie']
+      }
+    ];
   }
 }

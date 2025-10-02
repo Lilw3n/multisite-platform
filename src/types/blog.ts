@@ -65,7 +65,7 @@ export interface BlogPost {
   }>;
 }
 
-export type BlogCategory = 
+export type BlogCategoryType = 
   | 'assurance'
   | 'immobilier' 
   | 'finance'

@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { InterlocutorService } from '@/lib/interlocutors';
 import { Interlocutor } from '@/types/interlocutor';
 import Layout from '@/components/layout/Layout';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { 
   User, 
   Mail, 

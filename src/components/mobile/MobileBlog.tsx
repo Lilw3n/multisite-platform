@@ -17,7 +17,7 @@ import {
   Calendar,
   Tag,
   TrendingUp,
-  Fire,
+  Flame,
   Star,
   ChevronRight,
   Download,
@@ -350,7 +350,7 @@ export default function MobileBlog({ selectedPost, onPostSelect }: MobileBlogPro
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              <Fire className="h-4 w-4" />
+              <Flame className="h-4 w-4" />
               <span>Tous</span>
             </button>
             

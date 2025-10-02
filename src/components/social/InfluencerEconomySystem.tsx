@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Star, TrendingUp, Users, Gift, Crown, Zap, Target, Award, Coins, Share2, Eye, Heart, MessageCircle, ShoppingBag, Percent, Trophy, Fire, Gem } from 'lucide-react';
+import { Star, TrendingUp, Users, Gift, Crown, Zap, Target, Award, Coins, Share2, Eye, Heart, MessageCircle, ShoppingBag, Percent, Trophy, Flame, Gem } from 'lucide-react';
 
 interface CreatorProfile {
   id: string;
@@ -527,7 +527,7 @@ export default function InfluencerEconomySystem({
               }`}>
                 {challenge.trending && (
                   <div className="flex items-center space-x-2 mb-3">
-                    <Fire className="w-4 h-4 text-red-500" />
+                    <Flame className="w-4 h-4 text-red-500" />
                     <span className="text-red-600 text-sm font-medium">TENDANCE</span>
                   </div>
                 )}

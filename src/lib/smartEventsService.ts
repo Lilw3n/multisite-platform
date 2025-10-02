@@ -993,10 +993,18 @@ export class SmartEventsService {
     return events.find(e => e.id === id) || null;
   }
 
-  static deleteEvent(id: string): void {
-    const events = this.getAllEvents();
-    const filtered = events.filter(e => e.id !== id);
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filtered));
+  static deleteEvent(id: string): boolean {
+    if (typeof window === 'undefined') return false;
+    
+    try {
+      const events = this.getAllEvents();
+      const filteredEvents = events.filter(e => e.id !== id);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filteredEvents));
+      return true;
+    } catch (error) {
+      console.error('Erreur suppression événement:', error);
+      return false;
+    }
   }
 
   // Recherche et filtrage avancés

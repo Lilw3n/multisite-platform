@@ -12,8 +12,11 @@ export default function InterlocutorsPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    // Mock data pour les interlocuteurs - mélange d'utilisateurs et d'externes
-    const mockInterlocutors: Interlocutor[] = [
+    // Charger les interlocuteurs depuis le service
+    const loadedInterlocutors = InterlocutorService.getAllInterlocutors();
+    
+    // Si aucun interlocuteur, utiliser des données mock
+    const mockInterlocutors: Interlocutor[] = loadedInterlocutors.length > 0 ? loadedInterlocutors : [
       {
         id: '1',
         type: 'user',
@@ -256,7 +259,7 @@ export default function InterlocutorsPage() {
       }
     ];
 
-    setInterlocutors(mockInterlocutors);
+    setInterlocutors(loadedInterlocutors.length > 0 ? loadedInterlocutors : mockInterlocutors);
   }, []);
 
   const filteredInterlocutors = interlocutors.filter(interlocutor => {

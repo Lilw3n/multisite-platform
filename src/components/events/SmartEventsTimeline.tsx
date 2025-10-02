@@ -47,6 +47,7 @@ import {
   Monitor
 } from 'lucide-react';
 import { SmartEventsService } from '@/lib/smartEventsService';
+import { InterlocutorService } from '@/lib/interlocutors';
 import { 
   SmartEvent, 
   SmartEventFilter, 
@@ -603,7 +604,7 @@ export default function SmartEventsTimeline({
                   // Logique pour lier l'événement à l'interlocuteur
                   if (interlocutorId) {
                     try {
-                      const InterlocutorService = require('@/lib/interlocutors').InterlocutorService;
+                      // InterlocutorService déjà importé
                       const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
                       
                       if (interlocutor) {
@@ -654,7 +655,7 @@ export default function SmartEventsTimeline({
                   // Logique pour délier l'événement de l'interlocuteur
                   if (interlocutorId && confirm('Êtes-vous sûr de vouloir délier cet événement de l\'interlocuteur ?')) {
                     try {
-                      const InterlocutorService = require('@/lib/interlocutors').InterlocutorService;
+                      // InterlocutorService déjà importé
                       const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
                       
                       if (interlocutor) {
@@ -701,7 +702,7 @@ export default function SmartEventsTimeline({
                       
                       // Supprimer aussi de l'interlocuteur si lié
                       if (interlocutorId) {
-                        const InterlocutorService = require('@/lib/interlocutors').InterlocutorService;
+                        // InterlocutorService déjà importé
                         const interlocutor = InterlocutorService.getInterlocutorById(interlocutorId);
                         
                         if (interlocutor) {

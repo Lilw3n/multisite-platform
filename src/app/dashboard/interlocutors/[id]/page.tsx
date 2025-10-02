@@ -14,6 +14,7 @@ import EventForm from '@/components/EventForm';
 import ModuleAddForm from '@/components/ModuleAddForm';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
 import SmartEventsTimeline from '@/components/events/SmartEventsTimeline';
+import { SmartEventsService } from '@/lib/smartEventsService';
 import EligibilityChecker from '@/components/EligibilityChecker';
 import CompanyForm from '@/components/CompanyForm';
 import FamilyForm from '@/components/FamilyForm';
@@ -1033,7 +1034,6 @@ export default function InterlocutorDetailPage() {
                             };
                             
                             // Sauvegarder dans SmartEventsService
-                            const SmartEventsService = require('@/lib/smartEventsService').SmartEventsService;
                             SmartEventsService.saveEvent(newEvent);
                             
                             // Rafraîchir la page
@@ -1052,11 +1052,6 @@ export default function InterlocutorDetailPage() {
                           maxEvents={50}
                           autoRefresh={true}
                         />
-                      </div>
-                  </div>
-                      </div>
-                          ))}
-                      </div>
                       </div>
                     </div>
                   </div>

@@ -397,6 +397,9 @@ export class InterlocutorService {
       updatedAt: new Date().toISOString()
     };
 
+    // CORRECTION: Sauvegarder les modifications dans localStorage
+    saveInterlocutors(interlocutors);
+
     return {
       success: true,
       event: interlocutor.events[eventIndex]
@@ -426,6 +429,10 @@ export class InterlocutorService {
     }
 
     interlocutor.events.splice(eventIndex, 1);
+    
+    // CORRECTION: Sauvegarder les modifications dans localStorage
+    saveInterlocutors(interlocutors);
+    
     return { success: true };
   }
 

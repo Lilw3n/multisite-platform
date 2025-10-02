@@ -6,7 +6,7 @@ import {
   Globe, Users, Shield, TrendingUp, Star, ArrowRight, 
   Zap, Target, Award, Crown, Sparkles, Network, 
   Building, Car, Briefcase, GraduationCap, Heart,
-  MessageCircle, Video, ShoppingBag, MapPin, Clock
+  MessageCircle, Video, ShoppingBag, MapPin, Clock, User
 } from 'lucide-react';
 import HydrationSafe from '@/components/ui/HydrationSafe';
 
@@ -219,6 +219,13 @@ export default function ExternalHomePage() {
               </span>
             </div>
             <div className="flex items-center space-x-4">
+              <Link
+                href="/portfolio"
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1"
+              >
+                <User className="w-4 h-4" />
+                <span>Portfolio Diddy</span>
+              </Link>
               <Link
                 href="/external/social"
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1"
@@ -587,8 +594,9 @@ export default function ExternalHomePage() {
             </div>
             
             <div>
-              <h4 className="font-semibold text-white mb-4">Support</h4>
+              <h4 className="font-semibold text-white mb-4">À Propos</h4>
               <ul className="space-y-2 text-sm">
+                <li><Link href="/portfolio" className="hover:text-white transition-colors">Portfolio Diddy</Link></li>
                 <li><Link href="/external/contact" className="hover:text-white transition-colors">Contact</Link></li>
                 <li><Link href="/external/help" className="hover:text-white transition-colors">Aide</Link></li>
                 <li><Link href="/external/legal" className="hover:text-white transition-colors">Mentions légales</Link></li>

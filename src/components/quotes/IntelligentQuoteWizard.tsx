@@ -24,7 +24,8 @@ import {
   Users,
   Calculator,
   FileText,
-  Send
+  Send,
+  X
 } from 'lucide-react';
 
 interface IntelligentQuoteWizardProps {
@@ -476,7 +477,7 @@ export default function IntelligentQuoteWizard({
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="w-full">
       {/* Header avec progression */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
         <div className="p-6 border-b border-gray-200">
@@ -491,15 +492,26 @@ export default function IntelligentQuoteWizard({
               </p>
             </div>
             
-            {/* Score d'éligibilité */}
-            <div className="text-center">
-              <div className={`text-3xl font-bold ${
-                eligibilityScore >= 80 ? 'text-green-600' : 
-                eligibilityScore >= 60 ? 'text-yellow-600' : 'text-red-600'
-              }`}>
-                {eligibilityScore}%
+            <div className="flex items-center space-x-4">
+              {/* Score d'éligibilité */}
+              <div className="text-center">
+                <div className={`text-3xl font-bold ${
+                  eligibilityScore >= 80 ? 'text-green-600' : 
+                  eligibilityScore >= 60 ? 'text-yellow-600' : 'text-red-600'
+                }`}>
+                  {eligibilityScore}%
+                </div>
+                <p className="text-sm text-gray-600">Score d'éligibilité</p>
               </div>
-              <p className="text-sm text-gray-600">Score d'éligibilité</p>
+              
+              {/* Bouton fermer */}
+              <button
+                onClick={onCancel}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                title="Fermer"
+              >
+                <X className="h-6 w-6 text-gray-500" />
+              </button>
             </div>
           </div>
           

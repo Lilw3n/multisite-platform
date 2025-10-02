@@ -545,12 +545,14 @@ export default function QuotesPage() {
 
               {/* Assistant intelligent de création de devis */}
               {showIntelligentWizard && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                  <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[95vh] overflow-y-auto">
-                    <IntelligentQuoteWizard
-                      onComplete={handleIntelligentWizardComplete}
-                      onCancel={handleIntelligentWizardCancel}
-                    />
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 p-4 overflow-y-auto">
+                  <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl my-8 min-h-[80vh]">
+                    <div className="p-6">
+                      <IntelligentQuoteWizard
+                        onComplete={handleIntelligentWizardComplete}
+                        onCancel={handleIntelligentWizardCancel}
+                      />
+                    </div>
                   </div>
                 </div>
               )}

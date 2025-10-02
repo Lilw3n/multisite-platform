@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { IntelligentQuoteService } from '@/lib/intelligentQuoteService';
 import { 
   IntelligentQuoteSession, 
@@ -57,9 +57,14 @@ export default function IntelligentQuoteWizard({
   useEffect(() => {
     if (session) {
       updateSteps();
+    }
+  }, [session?.id, updateSteps]); // Utiliser la fonction useCallback
+
+  useEffect(() => {
+    if (session) {
       analyzeInRealTime();
     }
-  }, [session, answers]);
+  }, [session?.id, analyzeInRealTime]); // Utiliser la fonction useCallback
 
   const initializeSession = () => {
     let currentSession: IntelligentQuoteSession;
@@ -83,10 +88,16 @@ export default function IntelligentQuoteWizard({
     setSession(currentSession);
   };
 
-  const updateSteps = () => {
+  const updateSteps = useCallback(() => {
     if (!session) return;
     
     const insuranceType = answers.primary_type as InsuranceType || 'auto';
+    
+    // Éviter la mise à jour si le type d'assurance n'a pas changé
+    if (session.insuranceType === insuranceType && steps.length > 0) {
+      return;
+    }
+    
     const questionnaire = IntelligentQuoteService.getAdaptiveQuestionnaire(
       insuranceType, 
       session.sessionData
@@ -94,35 +105,75 @@ export default function IntelligentQuoteWizard({
     
     setSteps(questionnaire);
     
-    // Mettre à jour la session
-    const updatedSession = {
-      ...session,
-      totalSteps: questionnaire.length,
-      progress: Math.round((currentStepIndex / questionnaire.length) * 100),
-      insuranceType
-    };
-    
-    setSession(updatedSession);
-    IntelligentQuoteService.saveSession(updatedSession);
-  };
+    // Mettre à jour la session seulement si nécessaire
+    if (session.insuranceType !== insuranceType || session.totalSteps !== questionnaire.length) {
+      const updatedSession = {
+        ...session,
+        totalSteps: questionnaire.length,
+        progress: Math.round((currentStepIndex / questionnaire.length) * 100),
+        insuranceType
+      };
+      
+      setSession(updatedSession);
+      IntelligentQuoteService.saveSession(updatedSession);
+    }
+  }, [session, answers.primary_type, steps.length, currentStepIndex]);
 
-  const analyzeInRealTime = () => {
-    if (!session) return;
+  const analyzeInRealTime = useCallback(() => {
+    if (!session || Object.keys(answers).length === 0) return;
     
-    // Mettre à jour les données de session avec les réponses
-    const updatedSessionData = {
-      ...session.sessionData,
-      // TODO: Mapper les réponses vers la structure de données
-    };
-    
-    // Analyser l'éligibilité
-    const eligibility = IntelligentQuoteService.analyzeEligibility(updatedSessionData);
-    setEligibilityScore(eligibility.overallScore);
-    
-    // Générer des recommandations IA
-    const aiRecommendations = IntelligentQuoteService.generateAIRecommendations(updatedSessionData);
-    setRecommendations(aiRecommendations);
-  };
+    try {
+      // Mettre à jour les données de session avec les réponses
+      const updatedSessionData = {
+        ...session.sessionData,
+        // Mapper les réponses de base vers la structure de données
+        interlocutor: {
+          ...session.sessionData.interlocutor,
+          personalInfo: {
+            ...session.sessionData.interlocutor.personalInfo,
+            firstName: answers.first_name || session.sessionData.interlocutor.personalInfo.firstName,
+            lastName: answers.last_name || session.sessionData.interlocutor.personalInfo.lastName,
+            email: answers.email || session.sessionData.interlocutor.personalInfo.email,
+            phone: answers.phone || session.sessionData.interlocutor.personalInfo.phone,
+            dateOfBirth: answers.date_of_birth || session.sessionData.interlocutor.personalInfo.dateOfBirth,
+          },
+          address: {
+            ...session.sessionData.interlocutor.address,
+            street: answers.street || session.sessionData.interlocutor.address.street,
+            city: answers.city || session.sessionData.interlocutor.address.city,
+            postalCode: answers.postal_code || session.sessionData.interlocutor.address.postalCode,
+          }
+        },
+        insuranceData: {
+          ...session.sessionData.insuranceData,
+          primaryType: answers.primary_type || session.sessionData.insuranceData.primaryType,
+          needs: {
+            ...session.sessionData.insuranceData.needs,
+            budget: {
+              ...session.sessionData.insuranceData.needs.budget,
+              preferred: answers.budget_range || session.sessionData.insuranceData.needs.budget.preferred,
+            },
+            timeline: {
+              ...session.sessionData.insuranceData.needs.timeline,
+              urgency: answers.urgency || session.sessionData.insuranceData.needs.timeline.urgency,
+            }
+          }
+        }
+      };
+      
+      // Analyser l'éligibilité seulement si on a des données pertinentes
+      if (answers.date_of_birth || answers.budget_range || answers.primary_type) {
+        const eligibility = IntelligentQuoteService.analyzeEligibility(updatedSessionData);
+        setEligibilityScore(eligibility.overallScore);
+        
+        // Générer des recommandations IA
+        const aiRecommendations = IntelligentQuoteService.generateAIRecommendations(updatedSessionData);
+        setRecommendations(aiRecommendations);
+      }
+    } catch (error) {
+      console.error('Erreur analyse temps réel:', error);
+    }
+  }, [session, answers]);
 
   const handleAnswerChange = (questionId: string, value: any) => {
     const newAnswers = { ...answers, [questionId]: value };

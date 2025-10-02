@@ -11,23 +11,23 @@ import {
 import HydrationSafe from '@/components/ui/HydrationSafe';
 
 interface Platform {
-  id: string;
+    id: string;
   name: string;
-  description: string;
-  icon: string;
+    description: string;
+    icon: string;
   category: 'assurance' | 'social' | 'formation' | 'marketplace' | 'services';
   href: string;
-  features: string[];
+    features: string[];
   userCount: number;
   trending: boolean;
   comingSoon?: boolean;
 }
 
 interface Sector {
-  id: string;
+    id: string;
   name: string;
-  description: string;
-  icon: string;
+    description: string;
+    icon: string;
   platforms: Platform[];
   color: string;
 }
@@ -46,7 +46,7 @@ export default function ExternalHomePage() {
       id: 'transport',
       name: 'Transport & Mobilité',
       description: 'VTC, Taxi, Livraison, Transport de marchandises',
-      icon: '🚗',
+              icon: '🚗',
       color: 'from-blue-500 to-cyan-500',
       platforms: [
         {
@@ -351,18 +351,18 @@ export default function ExternalHomePage() {
               <h3 className="text-xl font-bold text-gray-900 mb-3">Interconnexion totale</h3>
               <p className="text-gray-600">
                 Un seul compte pour accéder à toutes les plateformes spécialisées de votre secteur et des secteurs connexes.
-              </p>
-            </div>
+            </p>
+          </div>
 
             <div className="text-center p-6 bg-purple-50 rounded-2xl">
               <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Target className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Spécialisation sectorielle</h3>
-              <p className="text-gray-600">
+                  <p className="text-gray-600">
                 Chaque plateforme est conçue spécifiquement pour répondre aux besoins uniques de votre secteur d'activité.
-              </p>
-            </div>
+                  </p>
+                </div>
 
             <div className="text-center p-6 bg-green-50 rounded-2xl">
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -372,7 +372,7 @@ export default function ExternalHomePage() {
               <p className="text-gray-600">
                 Assurance, communauté, formation, marketplace... Tous vos besoins professionnels en un seul endroit.
               </p>
-            </div>
+              </div>
           </div>
         </div>
       </section>
@@ -529,27 +529,27 @@ export default function ExternalHomePage() {
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
               Prêt à rejoindre l'écosystème DiddyHome ?
-            </h2>
+          </h2>
             <p className="text-xl text-gray-600 mb-8">
               Créez votre compte unique et accédez immédiatement à toutes les plateformes de votre secteur. 
               C'est gratuit et ça prend moins de 2 minutes !
-            </p>
+          </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link
-                href="/external/register"
+            <Link
+              href="/external/register"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors shadow-lg flex items-center justify-center space-x-2"
-              >
+            >
                 <Sparkles className="w-5 h-5" />
                 <span>Créer mon compte gratuit</span>
-              </Link>
-              <Link
+            </Link>
+            <Link
                 href="/external/login"
                 className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors flex items-center justify-center space-x-2"
-              >
+            >
                 <span>J'ai déjà un compte</span>
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+            </Link>
             </div>
 
             <p className="text-sm text-gray-500">
@@ -617,9 +617,9 @@ export default function ExternalHomePage() {
                 <Link href="/legal/mentions-legales" className="hover:text-white transition-colors">Mentions légales</Link>
                 <Link href="/legal/rgpd" className="hover:text-white transition-colors">RGPD</Link>
                 <Link href="/legal/cookies" className="hover:text-white transition-colors">Cookies</Link>
-              </div>
             </div>
           </div>
+        </div>
         </div>
       </footer>
     </div>

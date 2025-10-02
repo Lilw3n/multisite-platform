@@ -339,10 +339,45 @@ export class InterlocutorService {
       updatedAt: new Date().toISOString().split('T')[0]
     };
 
+    // Sauvegarder immédiatement après mise à jour générale
+    saveInterlocutors(interlocutors);
+
     return {
       success: true,
       interlocutor: interlocutors[index]
     };
+  }
+
+  // Création d'un projet (module conteneur simple côté front)
+  static async createProject(
+    interlocutorId: string,
+    data: { title: string; description: string; manager?: string }
+  ): Promise<{ success: boolean; error?: string; project?: any }> {
+    const interlocutor = interlocutors.find(i => i.id === interlocutorId);
+    if (!interlocutor) {
+      return { success: false, error: 'Interlocuteur non trouvé' };
+    }
+
+    // Représentation simple d'un projet côté front; stocké dans insuranceRequests en attendant un vrai backend
+    const project = {
+      id: this.generateId(),
+      interlocutorId,
+      type: 'project',
+      title: data.title,
+      description: data.description,
+      manager: data.manager || 'admin',
+      status: 'Nouveau',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    // On utilise insuranceRequests comme espace de stockage temporaire
+    if (!interlocutor.insuranceRequests) interlocutor.insuranceRequests = [];
+    (interlocutor.insuranceRequests as any).push(project);
+    interlocutor.updatedAt = new Date().toISOString().split('T')[0];
+    saveInterlocutors(interlocutors);
+
+    return { success: true, project };
   }
 
   static async deleteInterlocutor(id: string): Promise<{ success: boolean; error?: string }> {

@@ -121,6 +121,10 @@ export type ModuleType =
   | 'task' 
   | 'financial'
   | 'insurance'
+  | 'profile'
+  | 'vehicle'
+  | 'driver'
+  | 'product'
   | 'custom';
 
 export interface ModuleLink {

@@ -25,6 +25,8 @@ import VehicleForm from '@/components/VehicleForm';
 import DriverForm from '@/components/DriverForm';
 import { useClientSide } from '@/hooks/useClientSide';
 import { Company, Family } from '@/types';
+import WorkingDragDropManager from '@/components/dragdrop/WorkingDragDropManager';
+import ProjectFormModal from '@/components/ProjectFormModal';
 
 export default function InterlocutorDetailPage() {
   const isClient = useClientSide();
@@ -40,6 +42,14 @@ export default function InterlocutorDetailPage() {
   const [showEventsSidebar, setShowEventsSidebar] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [addFormType, setAddFormType] = useState<'claims' | 'vehicles' | 'drivers' | 'contracts' | 'insuranceRequests' | null>(null);
+  const [showClaimForm, setShowClaimForm] = useState(false);
+  const [showVehicleForm, setShowVehicleForm] = useState(false);
+  const [showDriverForm, setShowDriverForm] = useState(false);
+  const [showContractForm, setShowContractForm] = useState(false);
+  const [showQuoteForm, setShowQuoteForm] = useState(false);
+  const [showProfileForm, setShowProfileForm] = useState(false);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [showProjectForm, setShowProjectForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState<{ type: string; id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -48,6 +58,7 @@ export default function InterlocutorDetailPage() {
     id: string;
   } | null>(null);
   const [isSimulationMode, setIsSimulationMode] = useState(false);
+  const [showDragDropModules, setShowDragDropModules] = useState(false);
   const [simulatedInterlocutor, setSimulatedInterlocutor] = useState<Interlocutor | null>(null);
   const [showCompanyForm, setShowCompanyForm] = useState(false);
   const [showFamilyForm, setShowFamilyForm] = useState(false);
@@ -744,6 +755,118 @@ export default function InterlocutorDetailPage() {
     }
   };
 
+  // Fonction pour trouver un module par ID dans la hiérarchie
+  const findModuleById = (modules: any[], id: string): any => {
+    for (const module of modules) {
+      if (module.id === id) return module;
+      if (module.children) {
+        const found = findModuleById(module.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  // Fonction pour convertir les données de l'interlocuteur en modules pour le drag & drop
+  const convertInterlocutorToModules = (interlocutor: Interlocutor) => {
+    const modules: any[] = [];
+    
+    // Sinistres
+    if (interlocutor.claims) {
+      interlocutor.claims.forEach((claim: any) => {
+        modules.push({
+          id: claim.id,
+          type: 'claim',
+          name: claim.reference || 'Sinistre',
+          status: claim.status,
+          details: claim.description,
+          date: claim.date,
+          cost: claim.amount ? `${claim.amount}€` : undefined,
+          insurer: claim.insurer,
+          priority: claim.priority
+        });
+      });
+    }
+    
+    // Véhicules
+    if (interlocutor.vehicles) {
+      interlocutor.vehicles.forEach((vehicle: any) => {
+        modules.push({
+          id: vehicle.id,
+          type: 'vehicle',
+          name: `${vehicle.brand} ${vehicle.model} (${vehicle.year})`,
+          status: vehicle.status,
+          details: `Plaque: ${vehicle.licensePlate} - ${vehicle.type}`,
+          date: vehicle.registrationDate,
+          cost: vehicle.value ? `${vehicle.value}€` : undefined
+        });
+      });
+    }
+    
+    // Conducteurs
+    if (interlocutor.drivers) {
+      interlocutor.drivers.forEach((driver: any) => {
+        modules.push({
+          id: driver.id,
+          type: 'driver',
+          name: `${driver.firstName} ${driver.lastName}`,
+          status: driver.status,
+          details: `ID: ${driver.licenseNumber} - Catégorie: ${driver.licenseCategory}`,
+          date: driver.licenseIssueDate
+        });
+      });
+    }
+    
+    // Contrats
+    if (interlocutor.contracts) {
+      interlocutor.contracts.forEach((contract: any) => {
+        modules.push({
+          id: contract.id,
+          type: 'contract',
+          name: contract.type,
+          status: contract.status,
+          details: contract.description,
+          date: contract.startDate,
+          cost: contract.premium ? `${contract.premium}€` : undefined,
+          insurer: contract.insurer,
+          contractNumber: contract.policyNumber
+        });
+      });
+    }
+    
+    // Demandes d'assurance
+    if (interlocutor.insuranceRequests) {
+      interlocutor.insuranceRequests.forEach((request: any) => {
+        modules.push({
+          id: request.id,
+          type: 'insurance-request',
+          name: 'Demande d\'assurance',
+          status: request.status,
+          details: request.description,
+          date: request.createdAt,
+          assignedTo: request.assignedTo,
+          priority: request.priority
+        });
+      });
+    }
+    
+    // Événements
+    if (interlocutor.events) {
+      interlocutor.events.forEach((event: any) => {
+        modules.push({
+          id: event.id,
+          type: 'event',
+          name: event.title,
+          status: event.status,
+          details: event.description,
+          date: event.date
+        });
+      });
+    }
+    
+    return modules;
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
@@ -1105,6 +1228,14 @@ export default function InterlocutorDetailPage() {
                   >
                     <span>{showEventsSidebar ? '📅' : '📋'}</span>
                     <span>{showEventsSidebar ? 'Masquer les événements' : 'Afficher les événements'}</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setShowDragDropModules(!showDragDropModules)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2"
+                  >
+                    <span>{showDragDropModules ? '📁' : '🗂️'}</span>
+                    <span>{showDragDropModules ? 'Mode normal' : 'Organiser les modules'}</span>
                   </button>
                 </div>
               )}
@@ -1782,6 +1913,112 @@ export default function InterlocutorDetailPage() {
               </div>
             )}
 
+            {/* Section Drag & Drop des Modules */}
+            {showDragDropModules && (
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-6">
+                <div className="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                  <h3 className="text-lg font-semibold flex items-center">
+                    <span className="mr-2 text-xl">🗂️</span>
+                    Organisation des Modules - Mode Glisser-Déposer
+                  </h3>
+                  <p className="text-blue-100 text-sm mt-1">
+                    Organisez vos modules en les glissant-déposant. Créez des dossiers pour les regrouper.
+                  </p>
+                </div>
+                <div className="p-6">
+                  <WorkingDragDropManager
+                    modules={convertInterlocutorToModules(interlocutor)}
+                    onModulesUpdate={(newModules) => {
+                      console.log('📦 Modules mis à jour:', newModules);
+                      // Ici on devrait sauvegarder les modules dans l'interlocuteur
+                      // Pour l'instant on affiche juste un message
+                      alert('Modules mis à jour ! (Sauvegarde en cours de développement)');
+                    }}
+                    onModuleAdd={(moduleType) => {
+                      console.log('➕ Ajouter module:', moduleType);
+                      // Créer un module simple
+                      const newModule = {
+                        id: `${moduleType}-${Date.now()}`,
+                        type: moduleType,
+                        name: `Nouveau ${moduleType}`,
+                        status: 'Nouveau',
+                        details: `Module ${moduleType} créé`,
+                        date: new Date().toLocaleDateString('fr-FR'),
+                        isFolder: moduleType === 'project' || moduleType === 'folder',
+                        expanded: true,
+                        children: []
+                      };
+                      // Ici on devrait ajouter le module à l'interlocuteur
+                      alert(`Module ${moduleType} créé ! (Sauvegarde en cours de développement)`);
+                    }}
+                    onModuleEdit={(moduleId) => {
+                      console.log('🎯 Page interlocuteur - onModuleEdit appelé avec:', moduleId);
+                      // Si c'est un nouveau module, ouvrir le formulaire correspondant
+                      if (moduleId.startsWith('new-')) {
+                        const moduleType = moduleId.replace('new-', '');
+                        console.log('🎯 Type de module détecté:', moduleType);
+                        switch (moduleType) {
+                          case 'claim':
+                            console.log('🎯 Ouverture du formulaire de sinistre');
+                            setShowClaimForm(true);
+                            break;
+                          case 'vehicle':
+                            console.log('🎯 Ouverture du formulaire de véhicule');
+                            setShowVehicleForm(true);
+                            break;
+                          case 'driver':
+                            console.log('🎯 Ouverture du formulaire de conducteur');
+                            setShowDriverForm(true);
+                            break;
+                          case 'event':
+                            console.log('🎯 Ouverture du formulaire d\'événement');
+                            setShowEventForm(true);
+                            break;
+                          case 'contract':
+                            console.log('🎯 Ouverture du formulaire de contrat');
+                            setShowContractForm(true);
+                            break;
+                          case 'quote':
+                            console.log('🎯 Ouverture du formulaire de devis');
+                            setShowQuoteForm(true);
+                            break;
+                          case 'profile':
+                            console.log('🎯 Ouverture du formulaire de profil');
+                            setShowProfileForm(true);
+                            break;
+                          case 'product':
+                            console.log('🎯 Ouverture du formulaire de produit');
+                            setShowProductForm(true);
+                            break;
+                          case 'project':
+                            console.log('🎯 Ouverture du formulaire Projet');
+                            setShowProjectForm(true);
+                            break;
+                          default:
+                            console.log('❌ Type de module non géré:', moduleType);
+                        }
+                      } else {
+                        // Logique d'édition d'un module existant
+                        console.log('📝 Édition du module existant:', moduleId);
+                      }
+                    }}
+                    onModuleDelete={(moduleId) => {
+                      console.log('🗑️ Supprimer module:', moduleId);
+                      alert('Module supprimé ! (Fonctionnalité en cours de développement)');
+                    }}
+                    onModuleLink={(moduleId) => {
+                      console.log('🔗 Lier module:', moduleId);
+                      alert('Module lié ! (Fonctionnalité en cours de développement)');
+                    }}
+                    onModuleUnlink={(moduleId) => {
+                      console.log('🔓 Délier module:', moduleId);
+                      alert('Module délié ! (Fonctionnalité en cours de développement)');
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
                         </div>
                       </div>
                     </div>
@@ -1824,6 +2061,87 @@ export default function InterlocutorDetailPage() {
                  moduleType={addFormType}
                  onSuccess={handleAddSuccess}
                  onCancel={handleAddCancel}
+               />
+             )}
+
+             {/* Formulaire de sinistre */}
+             {showClaimForm && interlocutor && (
+               <ClaimForm
+                 isOpen={showClaimForm}
+                 onClose={() => setShowClaimForm(false)}
+                 onSubmit={(claimData) => {
+                   const newClaim = {
+                     ...claimData,
+                     id: Date.now().toString(),
+                     interlocutorId: interlocutor.id,
+                     createdAt: new Date().toISOString(),
+                     updatedAt: new Date().toISOString()
+                   };
+                   
+                   const updatedInterlocutor = {
+                     ...interlocutor,
+                     claims: [...(interlocutor.claims || []), newClaim]
+                   };
+                   
+                   setInterlocutor(updatedInterlocutor);
+                   updateInterlocutor(updatedInterlocutor);
+                   setShowClaimForm(false);
+                 }}
+                 interlocutor={interlocutor}
+               />
+             )}
+
+             {/* Formulaire de véhicule */}
+             {showVehicleForm && interlocutor && (
+               <VehicleForm
+                 isOpen={showVehicleForm}
+                 onClose={() => setShowVehicleForm(false)}
+                 onSubmit={(vehicleData) => {
+                   const newVehicle = {
+                     ...vehicleData,
+                     id: Date.now().toString(),
+                     interlocutorId: interlocutor.id,
+                     createdAt: new Date().toISOString(),
+                     updatedAt: new Date().toISOString()
+                   };
+                   
+                   const updatedInterlocutor = {
+                     ...interlocutor,
+                     vehicles: [...(interlocutor.vehicles || []), newVehicle]
+                   };
+                   
+                   setInterlocutor(updatedInterlocutor);
+                   updateInterlocutor(updatedInterlocutor);
+                   setShowVehicleForm(false);
+                 }}
+                 interlocutor={interlocutor}
+               />
+             )}
+
+             {/* Formulaire de conducteur */}
+             {showDriverForm && interlocutor && (
+               <DriverForm
+                 isOpen={showDriverForm}
+                 onClose={() => setShowDriverForm(false)}
+                 onSubmit={(driverData) => {
+                   const newDriver = {
+                     ...driverData,
+                     id: Date.now().toString(),
+                     interlocutorId: interlocutor.id,
+                     createdAt: new Date().toISOString(),
+                     updatedAt: new Date().toISOString()
+                   };
+                   
+                   const updatedInterlocutor = {
+                     ...interlocutor,
+                     drivers: [...(interlocutor.drivers || []), newDriver]
+                   };
+                   
+                   setInterlocutor(updatedInterlocutor);
+                   updateInterlocutor(updatedInterlocutor);
+                   setShowDriverForm(false);
+                 }}
+                 interlocutor={interlocutor}
                />
              )}
 
@@ -2134,6 +2452,43 @@ export default function InterlocutorDetailPage() {
                 onCancel={() => {
                   setShowEventEditForm(false);
                   setEditingEvent(null);
+                }}
+              />
+            )}
+
+            {/* Modal pour créer un nouveau projet */}
+            {showProjectForm && interlocutor && (
+              <ProjectFormModal
+                isOpen={showProjectForm}
+                onClose={() => setShowProjectForm(false)}
+                onSubmit={async (projectData) => {
+                  const newProject = {
+                    ...projectData,
+                    id: `project-${Date.now()}`,
+                    type: 'project',
+                    name: projectData.title,
+                    status: 'Nouveau',
+                    details: projectData.description,
+                    date: new Date().toLocaleDateString('fr-FR'),
+                    isFolder: true,
+                    expanded: true,
+                    children: [],
+                    title: projectData.title,
+                    description: projectData.description,
+                    manager: projectData.manager,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                  };
+                  
+                  // Ajouter le projet aux modules de l'interlocuteur
+                  const updatedInterlocutor = {
+                    ...interlocutor,
+                    projects: [...(interlocutor.projects || []), newProject]
+                  };
+                  
+                  setInterlocutor(updatedInterlocutor);
+                  updateInterlocutor(updatedInterlocutor);
+                  setShowProjectForm(false);
                 }}
               />
             )}

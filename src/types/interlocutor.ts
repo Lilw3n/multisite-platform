@@ -8,7 +8,7 @@ export interface Interlocutor {
   company?: string;
   address?: string;
   status: 'Actif' | 'Inactif' | 'En attente';
-  role: 'client' | 'prospect' | 'partenaire' | 'fournisseur';
+  role: 'client' | 'prospect' | 'partenaire' | 'fournisseur' | 'apporteur-affaire';
   createdAt: string;
   updatedAt: string;
   lastActivity: string;

@@ -48,6 +48,19 @@ export interface VehicleTechnicalData {
   ownerSiret?: string; // Si propriétaire entreprise
   usage: 'personal' | 'professional' | 'vtc' | 'taxi' | 'delivery' | 'commercial';
   
+  // Propriétaires du véhicule
+  proprietaire1?: string; // Propriétaire du véhicule 1
+  proprietaire2?: string; // Propriétaire du véhicule 2
+  
+  // Documents et cartes grises
+  documents: {
+    bonCommande: boolean; // Bon de commande
+    contratLocation: boolean; // Contrat de location
+    carteGriseEtrangere: boolean; // Carte grise étrangère
+    carteGriseProvisoire: boolean; // Carte grise provisoire
+    carteGriseDefinitive: boolean; // Carte grise définitive
+  };
+  
   // Vérifications
   registrationCardOwner?: string;
   ownershipVerified: boolean;

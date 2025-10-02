@@ -78,7 +78,8 @@ const menuItems: MenuItem[] = [
     children: [
       { id: 'interlocutors-list', label: 'Liste des interlocuteurs', icon: Building, href: '/dashboard/interlocutors' },
       { id: 'interlocutors-create', label: 'Nouvel interlocuteur', icon: Plus, href: '/dashboard/interlocutors/new' },
-      { id: 'interlocutors-complete', label: 'Création complète', icon: UserCheck, href: '/dashboard/interlocutors/create-complete' }
+      { id: 'interlocutors-complete', label: 'Création complète', icon: UserCheck, href: '/dashboard/interlocutors/create-complete' },
+      { id: 'interlocutors-modules', label: 'Gestion des modules', icon: FileText, href: '/dashboard/interlocutors/modules' }
     ]
   },
   {

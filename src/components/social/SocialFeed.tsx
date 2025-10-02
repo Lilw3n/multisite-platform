@@ -630,17 +630,16 @@ export default function SocialFeed({ userRole = 'guest', onLeadGenerated }: Soci
           </div>
         </div>
       )}
-    </div>
 
-    {/* Modal de profil */}
-    {selectedProfile && (
-      <UserProfileModal
-        profile={selectedProfile}
-        isOpen={!!selectedProfile}
-        onClose={() => setSelectedProfile(null)}
-        currentUserId="current-user"
-      />
-    )}
+      {/* Modal de profil */}
+      {selectedProfile && (
+        <UserProfileModal
+          profile={selectedProfile}
+          isOpen={!!selectedProfile}
+          onClose={() => setSelectedProfile(null)}
+          currentUserId="current-user"
+        />
+      )}
     </div>
   );
 }

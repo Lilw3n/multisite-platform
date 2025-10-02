@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ModeManager from '@/components/layout/ModeManager';
+import MobileDashboard from '@/components/mobile/MobileDashboard';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<{ email: string; name: string } | null>(null);
@@ -11,6 +12,7 @@ export default function DashboardPage() {
   const [userRole, setUserRole] = useState<'admin' | 'internal' | 'external'>('admin');
   const [testMode, setTestMode] = useState(false);
   const [viewMode, setViewMode] = useState('admin');
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,6 +33,15 @@ export default function DashboardPage() {
       } else {
         router.push('/login');
       }
+
+      // Détecter mobile
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
     }
   }, [router]);
 
@@ -59,6 +70,11 @@ export default function DashboardPage() {
 
   if (!user) {
     return null;
+  }
+
+  // Version mobile
+  if (isMobile) {
+    return <MobileDashboard userRole={userRole} />;
   }
 
   // En mode externe, rediriger vers la recherche d'interlocuteur

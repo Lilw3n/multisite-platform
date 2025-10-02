@@ -5,6 +5,7 @@ import { MinimalAuthProvider as AuthProvider } from '@/contexts/MinimalAuthConte
 import { HydrationBoundary } from '@/components/ui/HydrationBoundary';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import SocialNavigationWrapper from '@/components/navigation/SocialNavigationWrapper';
+import MobileLayout from '@/components/mobile/MobileLayout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,9 +24,11 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <HydrationBoundary fallback={<LoadingSpinner />}>
           <AuthProvider>
-            <SocialNavigationWrapper>
-              {children}
-            </SocialNavigationWrapper>
+            <MobileLayout>
+              <SocialNavigationWrapper>
+                {children}
+              </SocialNavigationWrapper>
+            </MobileLayout>
           </AuthProvider>
         </HydrationBoundary>
       </body>

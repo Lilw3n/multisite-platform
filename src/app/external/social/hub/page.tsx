@@ -18,11 +18,23 @@ import CreatorAgencySystem from '@/components/creator/CreatorAgencySystem';
 import PrivateGroupsSystem from '@/components/social/PrivateGroupsSystem';
 import ECommerceMarketplace from '@/components/commerce/ECommerceMarketplace';
 import DealsFinderSystem from '@/components/deals/DealsFinderSystem';
+import MobileSocialHub from '@/components/mobile/MobileSocialHub';
 
 export default function SocialHubPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'feed' | 'marketplace' | 'matching' | 'live' | 'creators' | 'agency' | 'groups' | 'deals'>('feed');
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleLeadGenerated = (lead: any) => {
     console.log('Lead généré:', lead);
@@ -71,6 +83,12 @@ export default function SocialHubPage() {
     }
   };
 
+  // Version mobile
+  if (isMobile) {
+    return <MobileSocialHub activeTab={activeTab} onTabChange={setActiveTab} />;
+  }
+
+  // Version desktop
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
